@@ -1,0 +1,259 @@
+{
+  "layers": {
+    "convolution": {
+      "Conv2d": {
+        "formatted_name": "2D Convolution",
+        "parameters": [
+          {
+            "name": "in_channels",
+            "type": ["int"],
+            "description": "(int) \u2013 Number of channels in the input image. Required.",
+            "default": null,
+            "required": true
+          },
+          {
+            "name": "out_channels",
+            "type": ["int"],
+            "description": "(int) \u2013 Number of channels produced by the convolution. Required.",
+            "default": null,
+            "required": true
+          },
+          {
+            "name": "kernel_size",
+            "type": ["int", "tuple"],
+            "description": "(int or tuple) \u2013 Size of the convolving kernel. Required.",
+            "default": null,
+            "required": true
+          },
+          {
+            "name": "stride",
+            "type": ["int", "tuple"],
+            "description": "(int or tuple, optional) \u2013 Stride of the convolution. Default: 1.",
+            "default": 1,
+            "required": false
+          },
+          {
+            "name": "padding",
+            "type": ["int", "tuple", "str"],
+            "description": "(int, tuple, or str, optional) \u2013 Padding added to all four sides of the input. Default: 0.",
+            "default": 0,
+            "required": false
+          },
+          {
+            "name": "dilation",
+            "type": ["int", "tuple"],
+            "description": "(int or tuple, optional) \u2013 Spacing between kernel elements. Default: 1.",
+            "default": 1,
+            "required": false
+          },
+          {
+            "name": "groups",
+            "type": ["int"],
+            "description": "(int, optional) \u2013 Number of blocked connections from input channels to output channels. Default: 1.",
+            "default": 1,
+            "required": false
+          },
+          {
+            "name": "bias",
+            "type": ["bool"],
+            "description": "(bool, optional) \u2013 If True, adds a learnable bias to the output. Default: True.",
+            "default": true,
+            "required": false
+          },
+          {
+            "name": "padding_mode",
+            "type": ["str"],
+            "description": "(str, optional) \u2013 Padding mode: 'zeros', 'reflect', 'replicate' or 'circular'. Default: 'zeros'.",
+            "default": "zeros",
+            "required": false,
+            "choices": ["zeros", "reflect", "replicate", "circular"]
+          },
+          {
+            "name": "device",
+            "type": ["str", "null"],
+            "description": "(str or None, optional) \u2013 Specifies the device to use for the operation. Default: None.",
+            "default": null,
+            "required": false
+          },
+          {
+            "name": "dtype",
+            "type": ["str", "null"],
+            "description": "(str or None, optional) \u2013 Specifies the data type. Default: None.",
+            "default": null,
+            "required": false
+          }
+        ],
+        "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html#torch.nn.Conv2d"
+      },
+      "Conv3d": {
+        "formatted_name": "3D Convolution",
+        "parameters": [
+          {
+            "name": "in_channels",
+            "type": ["int"],
+            "description": "(int) \u2013 Number of channels in the input image. Required.",
+            "default": null,
+            "required": true
+          },
+          {
+            "name": "out_channels",
+            "type": ["int"],
+            "description": "(int) \u2013 Number of channels produced by the convolution. Required.",
+            "default": null,
+            "required": true
+          },
+          {
+            "name": "kernel_size",
+            "type": ["int", "tuple"],
+            "description": "(int or tuple) \u2013 Size of the convolving kernel. Required.",
+            "default": null,
+            "required": true
+          },
+          {
+            "name": "stride",
+            "type": ["int", "tuple"],
+            "description": "(int or tuple, optional) \u2013 Stride of the convolution. Default: 1.",
+            "default": 1,
+            "required": false
+          },
+          {
+            "name": "padding",
+            "type": ["int", "tuple", "str"],
+            "description": "(int, tuple, or str, optional) \u2013 Padding added to all four sides of the input. Default: 0.",
+            "default": 0,
+            "required": false
+          },
+          {
+            "name": "dilation",
+            "type": ["int", "tuple"],
+            "description": "(int or tuple, optional) \u2013 Spacing between kernel elements. Default: 1.",
+            "default": 1,
+            "required": false
+          },
+          {
+            "name": "groups",
+            "type": ["int"],
+            "description": "(int, optional) \u2013 Number of blocked connections from input channels to output channels. Default: 1.",
+            "default": 1,
+            "required": false
+          },
+          {
+            "name": "bias",
+            "type": ["bool"],
+            "description": "(bool, optional) \u2013 If True, adds a learnable bias to the output. Default: True.",
+            "default": true,
+            "required": false
+          },
+          {
+            "name": "padding_mode",
+            "type": ["str"],
+            "description": "(str, optional) \u2013 Padding mode: 'zeros', 'reflect', 'replicate' or 'circular'. Default: 'zeros'.",
+            "default": "zeros",
+            "required": false,
+            "choices": ["zeros", "reflect", "replicate", "circular"]
+          },
+          {
+            "name": "device",
+            "type": ["str", "null"],
+            "description": "(str or None, optional) \u2013 Specifies the device to use for the operation. Default: None.",
+            "default": null,
+            "required": false
+          },
+          {
+            "name": "dtype",
+            "type": ["str", "null"],
+            "description": "(str or None, optional) \u2013 Specifies the data type. Default: None.",
+            "default": null,
+            "required": false
+          }
+        ],
+        "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.Conv3d.html#torch.nn.Conv3d"
+      }
+    },
+    "pooling": {
+      "MaxPool1d": {
+        "formatted_name": "1D Max Pooling",
+        "parameters": [
+          {
+            "name": "kernel_size",
+            "type": ["int"],
+            "description": "(int) \u2013 Size of the sliding window. Required.",
+            "default": null,
+            "required": true
+          },
+          {
+            "name": "stride",
+            "type": ["int"],
+            "description": "(int, optional) \u2013 Stride of the sliding window. Default: None.",
+            "default": null,
+            "required": false
+          },
+          {
+            "name": "padding",
+            "type": ["int"],
+            "description": "(int, optional) \u2013 Zero-padding added to both sides of the input. Default: 0.",
+            "default": 0,
+            "required": false
+          },
+          {
+            "name": "dilation",
+            "type": ["int"],
+            "description": "(int, optional) \u2013 Spacing between kernel elements. Default: 1.",
+            "default": 1,
+            "required": false
+          },
+          {
+            "name": "return_indices",
+            "type": ["bool"],
+            "description": "(bool, optional) \u2013 If True, will return the max indices along with the outputs. Useful for torch.nn.MaxUnpool1d later. Default: False.",
+            "default": false,
+            "required": false
+          },
+          {
+            "name": "ceil_mode",
+            "type": ["bool"],
+            "description": "(bool, optional) \u2013 When True, will use ceil instead of floor to compute the output shape. Default: False.",
+            "default": false,
+            "required": false
+          }
+        ],
+        "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.MaxPool1d.html#torch.nn.MaxPool1d"
+      }
+    }
+  },
+  "activations": {
+    "ReLU": {
+      "formatted_name": "ReLU",
+      "parameters": [
+        {
+          "name": "inplace",
+          "type": ["bool"],
+          "description": "(bool, optional) \u2013 Can optionally do the operation in-place. Default: False.",
+          "default": false,
+          "required": false
+        }
+      ],
+      "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html#torch.nn.ReLU"
+    },
+    "LeakyReLU": {
+      "formatted_name": "Leaky ReLU",
+      "parameters": [
+        {
+          "name": "negative_slope",
+          "type": ["float"],
+          "description": "(float, optional) \u2013 Controls the angle of the negative slope. Default: 0.01.",
+          "default": 0.01,
+          "required": false
+        },
+        {
+          "name": "inplace",
+          "type": ["bool"],
+          "description": "(bool, optional) \u2013 Can optionally do the operation in-place. Default: False.",
+          "default": false,
+          "required": false
+        }
+      ],
+      "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.LeakyReLU.html#torch.nn.LeakyReLU"
+    }
+  }
+}
