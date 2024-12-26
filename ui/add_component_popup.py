@@ -1,31 +1,25 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
 import json
+from utils.file_helper import load_json
 
 class AddComponentPopup(QtWidgets.QWidget):
-    def __init__(self, component_type, component_name, parent=None):
+    # Define the custom signal
+    component_added_signal = QtCore.pyqtSignal(dict)
+    def __init__(self, component_dict, parent=None):
         super().__init__(parent)
         self.setWindowFlags(QtCore.Qt.Window) # Make it a top-level window
         self.setWindowTitle("New Component")
-        self.component_type = component_type
-        self.component_name = component_name
+        self.component_dict = component_dict
         self.input_widgets = []
         self.args = {}
 
         # Load component parameters from JSON
-        self.component_params = self.load_component_params()        
+        self.component_params = load_json('models', 'component_params.json')    
 
         # Initialize UI
         self.init_ui()
         
-    def load_component_params(self):
-        """
-        Loads the component parameters from a JSON file.
-        """
-        # FIXME: Change the path to the JSON file relative to your project
-        with open("D:/OneDrive - Uppsala universitet/General/AI-Studio/models/component_params.json", "r") as json_file:
-            return json.load(json_file)
-
     def init_ui(self):
         vertical_layout = QtWidgets.QVBoxLayout(self)
 
@@ -36,7 +30,7 @@ class AddComponentPopup(QtWidgets.QWidget):
 
         # Create grid layout for parameters
         grid_layout = QtWidgets.QGridLayout()
-        for i, param in enumerate(self.component_params[self.component_type][self.component_name]['parameters']):
+        for i, param in enumerate(self.component_dict['parameters']):
             label = QtWidgets.QLabel()
             param_name = param['name']
             required = param['required']
@@ -81,7 +75,7 @@ class AddComponentPopup(QtWidgets.QWidget):
         documentation_label.setText(f"Click here for full documentation")
         documentation_label.setStyleSheet("color: blue;")
         documentation_label.setOpenExternalLinks(True)
-        documentation_label.mousePressEvent = partial(self.open_documenation, self.component_params[self.component_type][self.component_name]['documentation'])
+        documentation_label.mousePressEvent = partial(self.open_documenation, self.component_dict['documentation'])
         
         vertical_layout.addWidget(documentation_label)
         
@@ -117,7 +111,7 @@ class AddComponentPopup(QtWidgets.QWidget):
             else:
                 value = widget.text().strip() or widget.placeholderText()
             
-            param_info = self.component_params[self.component_type][self.component_name]['parameters'][i]
+            param_info = self.component_dict['parameters'][i]
             parsed_value = self.parse_value(value, param_info)
 
             if parsed_value is None and "null" not in param_info['type']:
@@ -129,7 +123,8 @@ class AddComponentPopup(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "Invalid Parameters", f"Invalid parameters: {', '.join(invalid_params)}")
             self.args = {}
         else:
-            print(self.args)
+            # Emit the signal with the collected arguments
+            self.component_added_signal.emit(self.args)
             self.close()
 
     def parse_value(self, value, param_info):
@@ -138,7 +133,6 @@ class AddComponentPopup(QtWidgets.QWidget):
         """
         valid_types = param_info['type']
         choices = param_info.get('choices')
-        print(value)
         try:
             if value == "None" and "null" in valid_types:
                 return None
