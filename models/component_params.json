@@ -183,7 +183,7 @@
           },
           {
             "name": "stride",
-            "type": ["int"],
+            "type": ["int", "null"],
             "description": "(int, optional) \u2013 Stride of the sliding window. Default: None.",
             "default": null,
             "required": false
@@ -218,6 +218,49 @@
           }
         ],
         "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.MaxPool1d.html#torch.nn.MaxPool1d"
+      }
+    },
+    "linear": {
+      "Linear": {
+        "formatted_name": "Linear",
+        "parameters": [
+          {
+            "name": "in_features",
+            "type": ["int"],
+            "description": "(int) \u2013 Size of each input sample. Required.",
+            "default": null,
+            "required": true
+          },
+          {
+            "name": "out_features",
+            "type": ["int"],
+            "description": "(int) \u2013 Size of each output sample. Required.",
+            "default": null,
+            "required": true
+          },
+          {
+            "name": "bias",
+            "type": ["bool"],
+            "description": "(bool, optional) \u2013 If set to False, the layer will not learn an additive bias. Default: True.",
+            "default": true,
+            "required": false
+          },
+          {
+            "name": "device",
+            "type": ["str", "null"],
+            "description": "(str or None, optional) \u2013 Specifies the device to use for the operation. Default: None.",
+            "default": null,
+            "required": false
+          },
+          {
+            "name": "dtype",
+            "type": ["str", "null"],
+            "description": "(str or None, optional) \u2013 Specifies the data type. Default: None.",
+            "default": null,
+            "required": false
+          }
+        ],
+        "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear"
       }
     }
   },
