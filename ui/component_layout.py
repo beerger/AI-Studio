@@ -1,11 +1,14 @@
 from PyQt5 import QtWidgets, QtCore
 from functools import partial
-import json
+from utils.file_helper import load_json, get_value_from_json
+from ui.add_component_popup import AddComponentPopup
 
 class ComponentLayoutWidget(QtWidgets.QWidget):
+    # Define the signal at the class level
+    component_added_signal = QtCore.pyqtSignal(dict)
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.component_params = self.load_component_params()
+        self.components_json = load_json('models', 'component_params.json')
 
         # Main layout for this widget
         layout = QtWidgets.QVBoxLayout(self)
@@ -16,38 +19,81 @@ class ComponentLayoutWidget(QtWidgets.QWidget):
         layout.addWidget(self.tree_widget)
 
         # Populate the tree with the component parameters
-        self.populate_tree(self.tree_widget, self.component_params)
-
+        self.populate_tree(self.tree_widget, self.components_json)
+        
+        self.tree_widget.itemClicked.connect(self.onItemClicked)
         # Expand all items by default
         self.tree_widget.expandAll()
-
+        
     def populate_tree(self, parent_widget, data):
-        """Populate the QTreeWidget, stopping when a 'parameters' field is encountered."""
+        """Populate the QTreeWidget and store raw keys for JSON traversal."""
         for key, value in data.items():
             # Add a tree item for the current key
             tree_item = QtWidgets.QTreeWidgetItem(parent_widget)
-            formatted_name =  value.get('formatted_name')
-            if formatted_name:
-                tree_item.setText(0, formatted_name)
+
+            # Display the formatted name (if available) or the capitalized key
+            formatted_name = value.get('formatted_name') if isinstance(value, dict) else None
+            tree_item.setText(0, formatted_name if formatted_name else key.capitalize())
+
+            # Store the raw key as custom data
+            tree_item.setData(0, QtCore.Qt.UserRole, key)
+
+            # Check if it's an end node
+            if isinstance(value, dict) and "parameters" in value:
+                tree_item.setFlags(tree_item.flags() | QtCore.Qt.ItemIsSelectable)  # Make selectable
+                continue
             else:
-                tree_item.setText(0, key.capitalize())
+                tree_item.setFlags(tree_item.flags() & ~QtCore.Qt.ItemIsSelectable)  # Disable selection
 
-            # Check if the current value is a dictionary
+            # Recurse into the dictionary
             if isinstance(value, dict):
-                # Stop if the dictionary contains a 'parameters' field
-                print(value)
-                print(key)
-                if "parameters" in value:
-                    continue
-                # Otherwise, recurse into the dictionary
                 self.populate_tree(tree_item, value)
+    
+    def get_full_json_path(self, item):
+        """Reconstruct the full path in the JSON using stored raw keys."""
+        path = []
+        while item is not None:
+            raw_key = item.data(0, QtCore.Qt.UserRole)  # Retrieve the stored raw key
+            path.insert(0, raw_key)  # Insert at the beginning
+            item = item.parent()  # Move to the parent item
+        return path
+    
+    def close_existing_popup(self):
+        """Close the existing popup if it's open."""
+        if hasattr(self, "popup") and self.popup:
+            self.popup.close()
+            self.popup = None
+    
+    def on_popup_closed(self, obj):
+        """Reset the popup reference when the popup is closed."""
+        self.popup = None
+    
+    def onItemClicked(self, item, column):
+        """
+        Handle the itemClicked signal for the QTreeWidget.
+        """
+        # Do nothing if the item is not selectable
+        if not (item.flags() & QtCore.Qt.ItemIsSelectable):
+            return
         
-    def load_component_params(self):
-        """
-        Loads the component parameters from a JSON file.
-        """
-        # FIXME: Change the path to the JSON file relative to your project
-        with open("D:/OneDrive - Uppsala universitet/General/AI-Studio/models/component_params.json", "r") as json_file:
-            return json.load(json_file)
+        # Close the existing popup if it's open
+        self.close_existing_popup()
 
+        component_dict = get_value_from_json(self.components_json, self.get_full_json_path(item))
+        raw_name = item.data(0, QtCore.Qt.UserRole) 
+        
+        self.popup = AddComponentPopup(component_dict, parent=self)
+        # Connect the custom signal to the slot method
+        self.popup.component_added_signal.connect(partial(self.handle_component_added, raw_name))
+        self.popup.show()
 
+        # Ensure the popup reference is reset when closed
+        self.popup.destroyed.connect(self.on_popup_closed)
+        
+    def handle_component_added(self, raw_name, args):
+        """
+        Slot to handle the component_added_signal signal from the popup.
+        """
+        component_data = {'name': raw_name, 'args': args}
+        # Emit the signal to propagate data to the MainWindow
+        self.component_added_signal.emit(component_data)
