@@ -8,6 +8,7 @@ from ui.component_layout import ComponentLayoutWidget
 from ui.menu_bar import MenuBar
 from utils.file_helper import get_absolute_path
 from utils.session_state import SessionState
+from ui.tab_manager import TabManager
 import os
 
 
@@ -18,7 +19,9 @@ class Ui_MainWindow(QObject):
         super().__init__()
         self.model_manager = ModelManager()
         self.current_save_path = None
+        self.load_session_state()
         
+    def load_session_state(self):
         # Load session state
         session_state = SessionState.load()
         self.current_save_path = session_state.get("last_save_path")
@@ -32,6 +35,7 @@ class Ui_MainWindow(QObject):
         self.init_main_window(MainWindow)
         self.init_layout(MainWindow)
         self.init_menu(MainWindow)
+        self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def init_main_window(self, MainWindow):
@@ -52,19 +56,32 @@ class Ui_MainWindow(QObject):
         """
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-
-        # Main horizontal layout
-        main_layout = QtWidgets.QHBoxLayout(self.centralwidget)
+        self.centralwidget.setContentsMargins(0, 0, 0, 0) # Remove central widget margins
+        
+        # Main vertical layout
+        main_v_layout = QtWidgets.QVBoxLayout(self.centralwidget)
+        main_v_layout.setContentsMargins(0, 0, 0, 0)  # Remove margins
+        main_v_layout.setSpacing(0)  # Remove spacing
+        
+        
+        self.tab_manager = TabManager(self.centralwidget)
+        main_v_layout.addWidget(self.tab_manager, stretch=0)
+        
+        
+        # Horizontal layout
+        h_layout = QtWidgets.QHBoxLayout()
 
         # Component layout widget
-        self.component_layout_widget = ComponentLayoutWidget()
-        self.component_layout_widget.component_added_signal.connect(self.handle_component_added)
-        main_layout.addWidget(self.component_layout_widget)
+        component_layout_widget = ComponentLayoutWidget()
+        component_layout_widget.component_added_signal.connect(self.handle_component_added)
+        h_layout.addWidget(component_layout_widget)
 
         # Add network visualization widget
         self.network = Network(self.model_manager)
         self.component_list_updated_signal.connect(self.network.handle_component_list_update)
-        main_layout.addWidget(self.network, stretch=10)
+        h_layout.addWidget(self.network, stretch=10)
+        
+        main_v_layout.addLayout(h_layout, stretch=10)
 
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -72,17 +89,19 @@ class Ui_MainWindow(QObject):
         """
         Initializes the menu bar and status bar.
         """
-        self.menubar = MenuBar(MainWindow)
-        MainWindow.setMenuBar(self.menubar)
-        self.menubar.new_signal.connect(self.new_network)
-        self.menubar.open_signal.connect(self.open_file)
-        self.menubar.save_signal.connect(self.save)
-        self.menubar.save_as_signal.connect(self.save_as)
-        self.menubar.generate_code_signal.connect(self.generate_code)
-        self.menubar.close_signal.connect(self.close_main_window)
-        
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        MainWindow.setStatusBar(self.statusbar)
+        pass
+        #self.tab_manager = TabManager()
+        #self.menubar = MenuBar(MainWindow)
+        #MainWindow.setMenuBar(self.menubar)
+        #self.menubar.new_signal.connect(self.new_network)
+        #self.menubar.open_signal.connect(self.open_file)
+        #self.menubar.save_signal.connect(self.save)
+        #self.menubar.save_as_signal.connect(self.save_as)
+        #self.menubar.generate_code_signal.connect(self.generate_code)
+        #self.menubar.close_signal.connect(self.close_main_window)
+        #
+        #self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        #MainWindow.setStatusBar(self.statusbar)
     
     def create_icon(self, *path_parts):
         """
@@ -181,3 +200,10 @@ class Ui_MainWindow(QObject):
             "is_new_network": self.current_save_path is None
         })
         QtWidgets.qApp.quit()
+        
+    def retranslateUi(self, MainWindow):
+        """
+        Sets up the text and titles for the UI components.
+        """
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("AI studio", "AI studio"))
