@@ -1,16 +1,14 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
-import json
 from utils.file_helper import load_json
 
 class AddComponentPopup(QtWidgets.QWidget):
-    # Define the custom signal
-    component_added_signal = QtCore.pyqtSignal(dict)
-    def __init__(self, component_dict, parent=None):
+    def __init__(self, component_dict, signal_manager, parent=None):
         super().__init__(parent)
         self.setWindowFlags(QtCore.Qt.Window) # Make it a top-level window
         self.setWindowTitle("New Component")
         self.component_dict = component_dict
+        self.signal_manager = signal_manager
         self.input_widgets = []
         self.args = {}
 
@@ -124,7 +122,7 @@ class AddComponentPopup(QtWidgets.QWidget):
             self.args = {}
         else:
             # Emit the signal with the collected arguments
-            self.component_added_signal.emit(self.args)
+            self.signal_manager.component_added_signal.emit(self.args)
             self.close()
 
     def parse_value(self, value, param_info):

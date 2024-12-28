@@ -2,6 +2,7 @@ from pathlib import Path
 import json
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+ICON_DIR = PROJECT_ROOT / "resources" / "icons"
 
 def get_absolute_path(directory, filename):
     """

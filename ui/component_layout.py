@@ -5,9 +5,9 @@ from ui.add_component_popup import AddComponentPopup
 
 class ComponentLayoutWidget(QtWidgets.QWidget):
     # Define the signal at the class level
-    component_added_signal = QtCore.pyqtSignal(dict)
-    def __init__(self, parent=None):
+    def __init__(self, signal_manager, parent=None):
         super().__init__(parent)
+        self.signal_manager = signal_manager
         self.components_json = load_json('models', 'component_params.json')
 
         # Main layout for this widget
@@ -82,9 +82,18 @@ class ComponentLayoutWidget(QtWidgets.QWidget):
         component_dict = get_value_from_json(self.components_json, self.get_full_json_path(item))
         raw_name = item.data(0, QtCore.Qt.UserRole) 
         
-        self.popup = AddComponentPopup(component_dict, parent=self)
+        self.popup = AddComponentPopup(component_dict, self.signal_manager, parent=self)
+        
+        # Disconnect existing connections to avoid duplicates
+        # Since the SignalOwner class owns the signal
+        try:
+            self.signal_manager.component_added_signal.disconnect()
+        except TypeError:
+            # If no connections exist, it's safe to ignore this
+            pass
+        
         # Connect the custom signal to the slot method
-        self.popup.component_added_signal.connect(partial(self.handle_component_added, raw_name))
+        self.signal_manager.component_added_signal.connect(partial(self.handle_component_added, raw_name))
         self.popup.show()
 
         # Ensure the popup reference is reset when closed
@@ -96,4 +105,4 @@ class ComponentLayoutWidget(QtWidgets.QWidget):
         """
         component_data = {'name': raw_name, 'args': args}
         # Emit the signal to propagate data to the MainWindow
-        self.component_added_signal.emit(component_data)
+        self.signal_manager.components_updated_signal.emit(component_data)

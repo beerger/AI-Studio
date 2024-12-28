@@ -1,6 +1,5 @@
 from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtCore import QObject, pyqtSignal, QRect
-import torch.nn as nn
+from PyQt5.QtCore import QObject, pyqtSignal
 from core.module import ModelManager, WRAPPER_REGISTRY
 from core.code_generator import CodeGenerator
 from ui.network import Network
@@ -9,24 +8,22 @@ from ui.menu_bar import MenuBar
 from utils.file_helper import get_absolute_path
 from utils.session_state import SessionState
 from ui.tab_manager import TabManager
-import os
+from core.signal_manager import SignalManager
 
 
 class Ui_MainWindow(QObject):
-    component_list_updated_signal = pyqtSignal(object)
     
     def __init__(self):
         super().__init__()
         self.model_manager = ModelManager()
-        self.current_save_path = None
+        self.signal_manager = SignalManager()
         self.load_session_state()
         
     def load_session_state(self):
         # Load session state
         session_state = SessionState.load()
-        self.current_save_path = session_state.get("last_save_path")
-        if self.current_save_path and not session_state.get("is_new_network", True):
-            self.model_manager = ModelManager.load(self.current_save_path)
+        if session_state.get("last_save_path") and not session_state.get("is_new_network", True):
+            self.model_manager = ModelManager.load(session_state["last_save_path"])
 
     def setupUi(self, MainWindow):
         """
@@ -34,7 +31,7 @@ class Ui_MainWindow(QObject):
         """
         self.init_main_window(MainWindow)
         self.init_layout(MainWindow)
-        self.init_menu(MainWindow)
+        self.setup_connections()
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -47,7 +44,7 @@ class Ui_MainWindow(QObject):
         MainWindow.showMaximized()
 
         # Set the window icon
-        icon = self.create_icon('assets', 'company_logo.png')
+        icon = self.create_icon('resources', 'company_logo.png')
         MainWindow.setWindowIcon(icon)
 
     def init_layout(self, MainWindow):
@@ -63,46 +60,29 @@ class Ui_MainWindow(QObject):
         main_v_layout.setContentsMargins(0, 0, 0, 0)  # Remove margins
         main_v_layout.setSpacing(0)  # Remove spacing
         
-        
-        self.tab_manager = TabManager(self.centralwidget)
+        # Tab manager widget
+        self.tab_manager = TabManager(self.signal_manager, self.centralwidget)
         main_v_layout.addWidget(self.tab_manager, stretch=0)
-        
         
         # Horizontal layout
         h_layout = QtWidgets.QHBoxLayout()
 
+        component_dock_widget = QtWidgets.QDockWidget(self.centralwidget)
         # Component layout widget
-        component_layout_widget = ComponentLayoutWidget()
-        component_layout_widget.component_added_signal.connect(self.handle_component_added)
-        h_layout.addWidget(component_layout_widget)
+        component_layout_widget = ComponentLayoutWidget(self.signal_manager)
+        component_dock_widget.setWidget(component_layout_widget)
+        
+        h_layout.addWidget(component_dock_widget, stretch=1)
 
         # Add network visualization widget
-        self.network = Network(self.model_manager)
-        self.component_list_updated_signal.connect(self.network.handle_component_list_update)
+        self.network = Network(self.model_manager, self.signal_manager)
         h_layout.addWidget(self.network, stretch=10)
         
         main_v_layout.addLayout(h_layout, stretch=10)
 
+        MainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, component_dock_widget)
         MainWindow.setCentralWidget(self.centralwidget)
 
-    def init_menu(self, MainWindow):
-        """
-        Initializes the menu bar and status bar.
-        """
-        pass
-        #self.tab_manager = TabManager()
-        #self.menubar = MenuBar(MainWindow)
-        #MainWindow.setMenuBar(self.menubar)
-        #self.menubar.new_signal.connect(self.new_network)
-        #self.menubar.open_signal.connect(self.open_file)
-        #self.menubar.save_signal.connect(self.save)
-        #self.menubar.save_as_signal.connect(self.save_as)
-        #self.menubar.generate_code_signal.connect(self.generate_code)
-        #self.menubar.close_signal.connect(self.close_main_window)
-        #
-        #self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        #MainWindow.setStatusBar(self.statusbar)
-    
     def create_icon(self, *path_parts):
         """
         Creates a QIcon from the given path parts.
@@ -110,14 +90,6 @@ class Ui_MainWindow(QObject):
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(get_absolute_path(*path_parts)), QtGui.QIcon.Selected, QtGui.QIcon.On)
         return icon
-
-    def create_label_with_image(self, *path_parts):
-        """
-        Creates a QLabel with a specified image.
-        """
-        label = QtWidgets.QLabel(self.centralwidget)
-        label.setPixmap(QtGui.QPixmap(get_absolute_path(*path_parts)))
-        return label
 
     def handle_component_added(self, component_data):
         """
@@ -131,7 +103,18 @@ class Ui_MainWindow(QObject):
         # Instantiate the wrapper and add it to the model manager
         component = wrapper_class(name, args)
         self.model_manager.add_component(component)
-        self.component_list_updated_signal.emit(self.model_manager)
+        self.signal_manager.update_visualization_signal.emit(self.model_manager)
+        
+        
+    def setup_connections(self):
+        self.signal_manager.new_signal.connect(self.new_network)
+        self.signal_manager.open_signal.connect(self.open_file)
+        self.signal_manager.save_signal.connect(self.save)
+        self.signal_manager.save_as_signal.connect(self.save_as)
+        self.signal_manager.close_signal.connect(self.close_main_window)
+        
+        self.signal_manager.components_updated_signal.connect(self.handle_component_added)
+        
         
     def new_network(self):
         """
@@ -141,8 +124,7 @@ class Ui_MainWindow(QObject):
                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.Yes:
             self.model_manager = ModelManager()
-            self.component_list_updated_signal.emit(self.model_manager)
-            self.current_save_path = None
+            self.signal_manager.update_visualization_signal.emit(self.model_manager)
             SessionState.save({
             "last_save_path": None,
             "is_new_network": True
@@ -155,8 +137,7 @@ class Ui_MainWindow(QObject):
         path = QtWidgets.QFileDialog.getOpenFileName(None, "Open File", "", "Pickle Files (*.pkl)")[0]
         if path:
             self.model_manager = ModelManager.load(path)
-            self.component_list_updated_signal.emit(self.model_manager)
-            self.current_save_path = path
+            self.signal_manager.update_visualization_signal.emit(self.model_manager)
             SessionState.save({
             "last_save_path": path,
             "is_new_network": False
@@ -166,10 +147,12 @@ class Ui_MainWindow(QObject):
         """
         Saves the current model manager to the current path.
         """
-        if not self.current_save_path:
+        session_state = SessionState.load()
+        save_path = session_state.get("last_save_path")
+        if not save_path:
             self.save_as()
         else:
-            self.model_manager.save(self.current_save_path)
+            self.model_manager.save(save_path)
 
     def save_as(self):
         """
@@ -177,7 +160,6 @@ class Ui_MainWindow(QObject):
         """
         path = QtWidgets.QFileDialog.getSaveFileName(None, "Save As", "", "Pickle Files (*.pkl)")[0]
         if path:
-            self.current_save_path = path
             self.model_manager.save(path)
             SessionState.save({
             "last_save_path": path,
@@ -195,11 +177,10 @@ class Ui_MainWindow(QObject):
         """
         Closes the main window.
         """
-        SessionState.save({
-            "last_save_path": self.current_save_path,
-            "is_new_network": self.current_save_path is None
-        })
-        QtWidgets.qApp.quit()
+        reply = QtWidgets.QMessageBox.question(None, "Close", "Are you sure you want to close the application?",
+                                               QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        if reply == QtWidgets.QMessageBox.Yes:
+            QtWidgets.qApp.quit()
         
     def retranslateUi(self, MainWindow):
         """
