@@ -9,9 +9,13 @@ from core.module import ModelManager
 import torch
 
 class Network(QtWidgets.QWidget):
-    def __init__(self, model_manager, parent=None):
+    def __init__(self, model_manager, signal_manager, parent=None):
         super().__init__(parent)
         self.model_manager = model_manager
+        self.signal_manager = signal_manager
+        
+        # Connect the signal manager's update_visualization_signal to the handle_component_list_update method
+        self.signal_manager.update_visualization_signal.connect(self.handle_component_list_update)
 
         # Create a scroll area to wrap the layout
         self.scroll_area = QtWidgets.QScrollArea(self)
@@ -44,14 +48,19 @@ class Network(QtWidgets.QWidget):
                 child.widget().deleteLater()
 
         # Calculate the fixed height for components (50% of the parent height)
-        component_height = int(self.height() * 0.5)
-        component_width = int(self.width() * 0.1)
 
         # Iterate through the components
         for i, component in enumerate(self.model_manager):
             # Add the component's widget
             widget = component.get_widget()
+            component_height = int(self.height() * 0.3)
+            component_width = int(self.width() * 0.1)
+            if hasattr(widget, 'scaling_factor'):
+                component_height = int(component_height * widget.scaling_factor)
             widget.setFixedSize(component_width, component_height)  # Fixed width and height (50% of screen height)
+            current_stylesheet = widget.styleSheet()
+            font_stylesheet = "font-size: 32px;"
+            widget.setStyleSheet(current_stylesheet + font_stylesheet)  # Set the font size
             self.layout.addWidget(widget)
 
             # Add a line after each widget, except the last one
