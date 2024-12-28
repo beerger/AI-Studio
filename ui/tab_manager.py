@@ -17,8 +17,9 @@ class TabManager(QtWidgets.QWidget):
     TAB_COLOR = QColor(0, 64, 115, 255)  # Blue color
     TAB_COLOR_RGBA = "rgba(0, 64, 115, 255)"
     
-    def __init__(self, parent=None):
+    def __init__(self, signal_manager, parent=None):
         super(TabManager, self).__init__(parent)
+        self.signal_manager = signal_manager
         self.init_ui()
         self.setAutoFillBackground(True)
         parent_palette = self.palette()
@@ -38,7 +39,7 @@ class TabManager(QtWidgets.QWidget):
         self.tab.setFixedHeight(200) # TODO: Calculate based on screen size
         
         # Add tabs
-        self.tab.addTab(FileTab(), "FILE")
+        self.tab.addTab(FileTab(self.signal_manager), "FILE")
         self.tab.addTab(EditTab(), "EDIT")
         self.tab.addTab(ViewTab(), "VIEW")
         self.tab.addTab(ToolsTab(), "TOOLS")
