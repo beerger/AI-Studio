@@ -163,6 +163,7 @@ class MaxPool1dWrapper(Layer):
         button = QtWidgets.QPushButton(self.name)
         button.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         button.setStyleSheet(f"background-color: {self.get_color()}; color: white; border-radius: 5px;")
+        button.scaling_factor = 0.7
         return button
 
     def __str__(self):
@@ -187,6 +188,7 @@ class ReLUWrapper(Activation):
         button = QtWidgets.QPushButton(self.name)
         button.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         button.setStyleSheet(f"background-color: {self.get_color()}; color: white; border-radius: 5px;")
+        button.scaling_factor = 0.5
         return button
 
     def __str__(self):
@@ -207,6 +209,7 @@ class LeakyReLUWrapper(Activation):
         button = QtWidgets.QPushButton(self.name)
         button.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         button.setStyleSheet(f"background-color: {self.get_color()}; color: white; border-radius: 5px;")
+        button.scaling_factor = 0.5
         return button
 
     def __str__(self):
@@ -235,6 +238,7 @@ class LinearWrapper(Layer):
         button = QtWidgets.QPushButton(self.name)
         button.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         button.setStyleSheet(f"background-color: {self.get_color()}; color: white; border-radius: 5px;")
+        button.scaling_factor = 0.8
         return button
 
     def __str__(self):
