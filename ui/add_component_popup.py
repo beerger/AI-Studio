@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
 from utils.file_helper import load_json
+from core.signal_manager import SignalManager
 
 class AddComponentPopup(QtWidgets.QWidget):
     def __init__(self, component_dict, signal_manager, parent=None):
@@ -111,12 +112,10 @@ class AddComponentPopup(QtWidgets.QWidget):
             
             param_info = self.component_dict['parameters'][i]
             parsed_value = self.parse_value(value, param_info)
-
             if parsed_value is None and "null" not in param_info['type']:
                 invalid_params.append(widget.param_name)
             else:
                 self.args[widget.param_name] = parsed_value
-
         if invalid_params:
             QtWidgets.QMessageBox.warning(self, "Invalid Parameters", f"Invalid parameters: {', '.join(invalid_params)}")
             self.args = {}
@@ -134,6 +133,9 @@ class AddComponentPopup(QtWidgets.QWidget):
         try:
             if value == "None" and "null" in valid_types:
                 return None
+            # handle negative numbers
+            if value.startswith('-'):
+                value = value[1:]
             if "int" in valid_types and value.isdigit():
                 return int(value)
             if "float" in valid_types:

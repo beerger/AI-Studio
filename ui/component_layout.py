@@ -2,11 +2,15 @@ from PyQt5 import QtWidgets, QtCore
 from functools import partial
 from utils.file_helper import load_json, get_value_from_json
 from ui.add_component_popup import AddComponentPopup
+from core.model_manager import ModelManager
+from core.signal_manager import SignalManager
+from core.components import WRAPPER_REGISTRY
 
 class ComponentLayoutWidget(QtWidgets.QWidget):
     # Define the signal at the class level
-    def __init__(self, signal_manager, parent=None):
+    def __init__(self, signal_manager: SignalManager, parent=None):
         super().__init__(parent)
+        self.model_manager = ModelManager()
         self.signal_manager = signal_manager
         self.components_json = load_json('models', 'component_params.json')
 
@@ -103,6 +107,15 @@ class ComponentLayoutWidget(QtWidgets.QWidget):
         """
         Slot to handle the component_added_signal signal from the popup.
         """
-        component_data = {'name': raw_name, 'args': args}
-        # Emit the signal to propagate data to the MainWindow
-        self.signal_manager.components_updated_signal.emit(component_data)
+        wrapper_class = WRAPPER_REGISTRY.get(raw_name)
+        if not wrapper_class:
+            raise NotImplementedError(f"Wrapper class for {raw_name} not found.")
+        # Instantiate the wrapper and add it to the model manager
+        try:
+            component = wrapper_class(raw_name, args)
+            self.model_manager.add_component(component)
+            self.signal_manager.update_visualization_signal.emit()
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Error", f"Failed to add component: {e}")
+            # Retrigger the popup
+            self.onItemClicked(self.tree_widget.currentItem(), 0)

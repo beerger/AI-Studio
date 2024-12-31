@@ -1,10 +1,79 @@
 import os
+from core.model_manager import ModelManager
 
 class CodeGenerator:
-    def __init__(self, model_manager, output_dir):
-        self.model_manager = model_manager
+    def __init__(self, output_dir):
+        self.model_manager = ModelManager()
         self.output_dir = output_dir
+        
+    def generate_config_file(self):
+        """Generates the configuration file."""
+        config_file_path = os.path.join(self.output_dir, "config", "config.yaml")
+        os.makedirs(os.path.dirname(config_file_path), exist_ok=True)
 
+        with open(config_file_path, "w") as config_file:
+            config_file.write(self._generate_config_content())
+
+        print(f"Configuration file generated at {config_file_path}")
+
+    # TODO: Implement the _generate_config_content method correctly
+    def _generate_config_content(self):
+        """Generates the content of the configuration file."""
+        config_content = [
+            "model:",
+            self._indent("name: GeneratedModel", 1),
+            self._indent("input_shape: [1, 3, 224, 224]", 1),
+            self._indent("output_shape: [1, 1000]", 1),
+            "training:",
+            self._indent("batch_size: 32", 1),
+            self._indent("num_epochs: 100", 1),
+            self._indent("learning_rate: 0.001", 1),
+            "data:",
+            self._indent("path: /path/to/dataset", 1),
+        ]
+        return "\n".join(config_content) + "\n"
+    
+    def generate_training_script(self):
+        """Generates the training script file."""
+        training_script_path = os.path.join(self.output_dir, "scripts", "train.py")
+        os.makedirs(os.path.dirname(training_script_path), exist_ok=True)
+
+        with open(training_script_path, "w") as training_script:
+            training_script.write(self._generate_training_script_content())
+
+        print(f"Training script generated at {training_script_path}")
+        
+    # TODO: Implement the _generate_training_script_content method correctly
+    def _generate_training_script_content(self):
+        """Generates the content of the training script."""
+        training_script_content = [
+            "import torch",
+            "import torch.nn as nn",
+            "from torch.utils.data import DataLoader",
+            "from dataset import CustomDataset",
+            "from models.model import GeneratedModel",
+            "from utils import train, evaluate",
+            "from config import Config",
+            "",
+            "def main():",
+            self._indent("config = Config('config/config.yaml')", 1),
+            self._indent("device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')", 1),
+            self._indent("model = GeneratedModel()", 1),
+            self._indent("model.to(device)", 1),
+            self._indent("train_dataset = CustomDataset(config.data.path, train=True)", 1),
+            self._indent("train_loader = DataLoader(train_dataset, batch_size=config.training.batch_size, shuffle=True)", 1),
+            self._indent("optimizer = torch.optim.Adam(model.parameters(), lr=config.training.learning_rate)", 1),
+            self._indent("criterion = nn.CrossEntropyLoss()", 1),
+            self._indent("for epoch in range(config.training.num_epochs):", 1),
+            self._indent("train(model, train_loader, optimizer, criterion, device)", 2),
+            self._indent("evaluate(model, train_loader, criterion, device)", 2),
+            "",
+            "if __name__ == '__main__':",
+            self._indent("main()", 1),
+        ]
+        return "\n".join(training_script_content) + "\n"
+        
+    
     def generate_model_code(self):
         """Generates the model definition file."""
         model_code_path = os.path.join(self.output_dir, "models", "model.py")
@@ -50,9 +119,11 @@ class CodeGenerator:
 
     def generate_all(self):
         """Generates all required files and folders."""
-        self._generate_folders()
+        #self._generate_folders()
         self.generate_model_code()
+        self.generate_config_file()
+        self.generate_training_script()
 
-    def _generate_folders(self):
-        """Creates necessary folders."""
-        os.makedirs(os.path.join(self.output_dir, "models"), exist_ok=True)
+    #def _generate_folders(self):
+    #    """Creates necessary folders."""
+    #    os.makedirs(os.path.join(self.output_dir, "models"), exist_ok=True)

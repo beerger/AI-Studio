@@ -298,5 +298,27 @@
       ],
       "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.LeakyReLU.html#torch.nn.LeakyReLU"
     }
+  },
+  "utilities": {
+    "Flatten": {
+      "formatted_name": "Flatten",
+      "parameters": [
+        {
+          "name": "start_dim",
+          "type": ["int"],
+          "description": "(int, optional) \u2013 First dim to flatten. Default: 1.",
+          "default": 1,
+          "required": false
+        },
+        {
+          "name": "end_dim",
+          "type": ["int"],
+          "description": "(int, optional) \u2013 Last dim to flatten. Default: -1.",
+          "default": -1,
+          "required": false
+        }
+      ],
+      "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.Flatten.html#torch.nn.Flatten"
+    }
   }
 }

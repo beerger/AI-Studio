@@ -14,4 +14,4 @@ class SessionState:
         if os.path.exists(SessionState.FILE_NAME):
             with open(SessionState.FILE_NAME, "r") as f:
                 return json.load(f)
-        return {"last_save_path": None, "is_new_network": True}
+        return {"last_save_path": None}
