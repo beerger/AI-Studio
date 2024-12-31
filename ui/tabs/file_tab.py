@@ -10,13 +10,11 @@ tab_dictionary = {
             {'name': 'Open', 'icon': 'open.png', 'signal': 'open_signal'},
             {'name': 'Save', 'icon': 'save.png', 'signal': 'save_signal'},
             {'name': 'Save As', 'icon': 'save_as.png', 'signal': 'save_as_signal'},
-            {'name': 'Close', 'icon': 'close.png', 'signal': 'close_signal'}
         ],
+    'Application': [{'name': 'Close', 'icon': 'close.png', 'signal': 'close_signal'}],
 }
 
 class FileTab(QtWidgets.QWidget):
-    
-    closeRequested = pyqtSignal()
     
     def __init__(self, signal_manager, parent=None):
         super(FileTab, self).__init__(parent)

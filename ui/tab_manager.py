@@ -10,20 +10,22 @@ from ui.tabs.configuration_tab import ConfigurationTab
 from ui.tabs.run_tab import RunTab
 from ui.tabs.help_tab import HelpTab
 from ui.tabs.debug_tab import DebugTab
+from core.signal_manager import SignalManager
+from styling.color_scheme import ColorScheme
 
 class TabManager(QtWidgets.QWidget):
     
     model_manager_updated_signal = pyqtSignal(object)
-    TAB_COLOR = QColor(0, 64, 115, 255)  # Blue color
+    TAB_COLOR_Q = QColor(0, 64, 115, 255)  # Blue color
     TAB_COLOR_RGBA = "rgba(0, 64, 115, 255)"
     
-    def __init__(self, signal_manager, parent=None):
+    def __init__(self, signal_manager: SignalManager, parent=None):
         super(TabManager, self).__init__(parent)
         self.signal_manager = signal_manager
         self.init_ui()
         self.setAutoFillBackground(True)
         parent_palette = self.palette()
-        parent_palette.setColor(self.backgroundRole(), self.TAB_COLOR)  # Blue background
+        parent_palette.setColor(self.backgroundRole(), self.TAB_COLOR_Q)  # Blue background
         self.setPalette(parent_palette)
 
     def init_ui(self):
@@ -40,9 +42,9 @@ class TabManager(QtWidgets.QWidget):
         
         # Add tabs
         self.tab.addTab(FileTab(self.signal_manager), "FILE")
-        self.tab.addTab(EditTab(), "EDIT")
-        self.tab.addTab(ViewTab(), "VIEW")
-        self.tab.addTab(ToolsTab(), "TOOLS")
+        self.tab.addTab(EditTab(self.signal_manager), "EDIT")
+        self.tab.addTab(ViewTab(self.signal_manager), "VIEW")
+        self.tab.addTab(ToolsTab(self.signal_manager), "TOOLS")
         self.tab.addTab(ConfigurationTab(), "CONFIGURATION")
         self.tab.addTab(RunTab(), "RUN")
         self.tab.addTab(HelpTab(), "HELP")
