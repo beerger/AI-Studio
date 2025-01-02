@@ -1,8 +1,13 @@
 from PyQt5 import QtWidgets
+from PyQt5 import QtCore
 from utils.session_state import SessionState
 from core.model_manager import ModelManager
 from core.signal_manager import SignalManager
 from core.code_generator import CodeGenerator
+from core.onnx_exporter import ONNXExporter
+from ui.popups.onnx_popup import ONNXParametersPopup, ONNXErrorPopup
+from ui.popups.file_popup import get_output_popup
+from ui.popups.import_model_popup import ImportModelPopup
 import torch
 import os
 
@@ -41,19 +46,61 @@ class ToolsController:
         """
         Imports a pretrained model.
         """
-        print("Importing pretrained model...")
+        popup = ImportModelPopup()
+        if popup.exec_() == QtWidgets.QDialog.Accepted:
+            #values = popup.get_values()
+            print(f"Importing model")
     
     def export_onnx(self) -> None:
         """
-        Exports the network to ONNX format.
+        Exports the network to ONNX format with progress bar and error handling.
         """
-        print("Exporting to ONNX...")
+        popup = ONNXParametersPopup()
+        if popup.exec_() == QtWidgets.QDialog.Accepted:
+            values = popup.get_values()
+
+            # Initialize exporter
+            exporter = ONNXExporter("MyModel", values)
+
+            # Create a progress dialog
+            progress_dialog = QtWidgets.QProgressDialog("Exporting model...", "Cancel", 0, 100)
+            progress_dialog.setWindowModality(QtCore.Qt.WindowModal)
+            progress_dialog.setValue(0)
+
+            # Connect exporter signals
+            exporter.progress_signal.connect(progress_dialog.setValue)
+            exporter.success_signal.connect(lambda: QtWidgets.QMessageBox.information(None, "Export", "Model successfully exported to ONNX"))
+            exporter.error_signal.connect(lambda msg: self.handle_error(msg, values))
+            exporter.finished.connect(progress_dialog.close)  # Close progress dialog on completion
+            progress_dialog.canceled.connect(exporter.terminate)  # Allow canceling export
+
+            # Start export in a separate thread
+            exporter.start()
+
+            # Show progress dialog
+            progress_dialog.exec_()
+
+    def handle_error(self, error_message: str, values: dict):
+        """
+        Handles errors during export and shows the error popup.
+        """
+        error_popup = ONNXErrorPopup(f"Error during ONNX export: {error_message}")
+        if error_popup.exec_() == ONNXErrorPopup.RETRY:
+            self.export_onnx()  # Reopen the parameter popup for retry
+            
+    def remove_temp_file(self, tmp_path: str) -> None:
+        """
+        Removes the temporary file created during ONNX export.
+        """
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+            print(f"Temporary file removed: {tmp_path}")
     
     def generate_code(self) -> None:
         """
         Generates code for the network.
         """
-        output_dir = self.output_dir_popup()
+        output_dir = get_output_popup()
         if not output_dir:
             return
         code_generator = CodeGenerator(output_dir)
@@ -67,14 +114,7 @@ class ToolsController:
         if reply == QtWidgets.QMessageBox.Yes:
             os.system(f'code "{output_dir}"')
     
-    def output_dir_popup(self) -> str:
-        """
-        Opens a dialog to get the output directory.
-        
-        Return: 
-            The selected directory or an empty string if canceled.
-        """
-        answer = QtWidgets.QFileDialog.getExistingDirectory(None, "Select Output Directory", "")
-        if answer == QtWidgets.QFileDialog.Rejected:
-            return ""
-        return answer
+
+    
+
+

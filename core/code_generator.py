@@ -2,9 +2,10 @@ import os
 from core.model_manager import ModelManager
 
 class CodeGenerator:
-    def __init__(self, output_dir):
+    def __init__(self, output_dir, model_name):
         self.model_manager = ModelManager()
         self.output_dir = output_dir
+        self.model_name = model_name
         
     def generate_config_file(self):
         """Generates the configuration file."""
@@ -21,7 +22,7 @@ class CodeGenerator:
         """Generates the content of the configuration file."""
         config_content = [
             "model:",
-            self._indent("name: GeneratedModel", 1),
+            self._indent(f"name: {self.model_name}", 1),
             self._indent("input_shape: [1, 3, 224, 224]", 1),
             self._indent("output_shape: [1, 1000]", 1),
             "training:",
@@ -51,14 +52,14 @@ class CodeGenerator:
             "import torch.nn as nn",
             "from torch.utils.data import DataLoader",
             "from dataset import CustomDataset",
-            "from models.model import GeneratedModel",
+            f"from models.model import {self.model_name}",
             "from utils import train, evaluate",
             "from config import Config",
             "",
             "def main():",
             self._indent("config = Config('config/config.yaml')", 1),
             self._indent("device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')", 1),
-            self._indent("model = GeneratedModel()", 1),
+            self._indent(f"model = {self.model_name}()", 1),
             self._indent("model.to(device)", 1),
             self._indent("train_dataset = CustomDataset(config.data.path, train=True)", 1),
             self._indent("train_loader = DataLoader(train_dataset, batch_size=config.training.batch_size, shuffle=True)", 1),
@@ -74,10 +75,13 @@ class CodeGenerator:
         return "\n".join(training_script_content) + "\n"
         
     
-    def generate_model_code(self):
+    def generate_model_code(self, tmp_path=None):
         """Generates the model definition file."""
-        model_code_path = os.path.join(self.output_dir, "models", "model.py")
-        os.makedirs(os.path.dirname(model_code_path), exist_ok=True)
+        if not tmp_path:
+            model_code_path = os.path.join(self.output_dir, "models", "model.py")
+            os.makedirs(os.path.dirname(model_code_path), exist_ok=True)
+        else:
+            model_code_path = tmp_path
 
         with open(model_code_path, "w") as model_file:
             model_file.write(self._generate_imports())
@@ -96,9 +100,9 @@ class CodeGenerator:
     def _generate_class_definition(self):
         """Generates the main class definition."""
         class_def = [
-            "class GeneratedModel(nn.Module):",
+            f"class {self.model_name}(nn.Module):",
             self._indent("def __init__(self):", 1),
-            self._indent("super(GeneratedModel, self).__init__()", 2),
+            self._indent(f"super({self.model_name}, self).__init__()", 2),
             self._indent(self._generate_layers(), 2),
             self._indent("def forward(self, x):", 1),
             self._indent("return self.model(x)", 2),
@@ -110,7 +114,8 @@ class CodeGenerator:
         layers = ["self.model = nn.Sequential("]
         for component in self.model_manager.component_wrappers:
             layers.append(self._indent(f"nn.{component},", 3))
-        layers.append(")")
+        layers.append(self._indent(")", 2))
+        layers.append("")
         return "\n".join(layers)
 
     def _indent(self, text, level=0):
