@@ -18,10 +18,12 @@ import os
 
 class Ui_MainWindow(QObject):
     
-    def __init__(self):
+    def __init__(self, dpi=96, scaling_factor=1.0, signal_manager=None):
         super().__init__()
+        self.dpi = dpi
+        self.scaling_factor = scaling_factor
         self.model_manager = ModelManager.load_from_session_state(SessionState())
-        self.signal_manager = SignalManager()
+        self.signal_manager = signal_manager if signal_manager else SignalManager()
         self.setup_controllers()
         
     def setupUi(self, MainWindow):
@@ -40,7 +42,7 @@ class Ui_MainWindow(QObject):
         Initializes the main window properties.
         """
         MainWindow.setObjectName("MainWindow")
-        MainWindow.setGeometry(QtCore.QRect(0, 0, 2000, 600))
+        MainWindow.setGeometry(QtCore.QRect(0, 0, int(2000 * self.scaling_factor), int(600 * self.scaling_factor)))
         MainWindow.showMaximized()
 
         # Set the window icon
@@ -54,34 +56,47 @@ class Ui_MainWindow(QObject):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.centralwidget.setContentsMargins(0, 0, 0, 0) # Remove central widget margins
-        
         # Main vertical layout
         main_v_layout = QtWidgets.QVBoxLayout(self.centralwidget)
         main_v_layout.setContentsMargins(0, 0, 0, 0)  # Remove margins
         main_v_layout.setSpacing(0)  # Remove spacing
         
         # Tab manager widget
-        self.tab_manager = TabManager(self.signal_manager)
-        main_v_layout.addWidget(self.tab_manager, stretch=0)
+        self.tab_manager = TabManager(self.signal_manager, scaling_factor=self.scaling_factor)
+        self.tab_manager.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        main_v_layout.addWidget(self.tab_manager, stretch=1) # stretch=1
         
-        # Horizontal layout
-        h_layout = QtWidgets.QHBoxLayout()
-
-        component_dock_widget = QtWidgets.QDockWidget(self.centralwidget)
-        # Component layout widget
-        component_layout_widget = ComponentLayoutWidget(self.signal_manager)
-        component_dock_widget.setWidget(component_layout_widget)
+        components_dock_widget = QtWidgets.QDockWidget(self.centralwidget)
+        components_widget = ComponentLayoutWidget(self.signal_manager)
+        components_dock_widget.setWidget(components_widget)
+        components_dock_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         
-        h_layout.addWidget(component_dock_widget, stretch=1)
+        # Layout for the component dock widget and network visualization
+        dock_network_layout = QtWidgets.QHBoxLayout()
+        dock_network_layout.addWidget(components_dock_widget, stretch=1) 
 
         # Add network visualization widget
         self.network = Network(self.signal_manager)
-        h_layout.addWidget(self.network, stretch=10)
+        self.network.wheelEvent = self.wheelEvent  # Override wheel event
+        self.network.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        dock_network_layout.addWidget(self.network, stretch=4)
         
-        main_v_layout.addLayout(h_layout, stretch=10)
+        main_v_layout.addLayout(dock_network_layout, stretch=9) # stretch=9
+        
+        # Dock for dataloader
+        dataloader_dock_widget = QtWidgets.QDockWidget(self.centralwidget)
+        dataloader_widget = QtWidgets.QLabel("Dataloader")
+        dataloader_dock_widget.setWidget(dataloader_widget)
+        
+        # Dock for configuration
+        configuration_dock_widget = QtWidgets.QDockWidget(self.centralwidget)
+        configuration_widget = QtWidgets.QLabel("Configuration")
+        configuration_dock_widget.setWidget(configuration_widget)
 
-        MainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, component_dock_widget)
         MainWindow.setCentralWidget(self.centralwidget)
+        MainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, components_dock_widget)
+        MainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, dataloader_dock_widget)
+        MainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, configuration_dock_widget)
 
     def init_status_bar(self, MainWindow):
         """
