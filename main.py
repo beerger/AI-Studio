@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets
 from ui.main_window import Ui_MainWindow
+from PyQt5 import QtWidgets
 
 if __name__ == "__main__":
     import sys

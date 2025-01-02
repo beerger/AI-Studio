@@ -88,14 +88,6 @@ class ToolsController:
         if error_popup.exec_() == ONNXErrorPopup.RETRY:
             self.export_onnx()  # Reopen the parameter popup for retry
             
-    def remove_temp_file(self, tmp_path: str) -> None:
-        """
-        Removes the temporary file created during ONNX export.
-        """
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
-            print(f"Temporary file removed: {tmp_path}")
-    
     def generate_code(self) -> None:
         """
         Generates code for the network.
@@ -113,8 +105,3 @@ class ToolsController:
         # open output directory in VS Code
         if reply == QtWidgets.QMessageBox.Yes:
             os.system(f'code "{output_dir}"')
-    
-
-    
-
-

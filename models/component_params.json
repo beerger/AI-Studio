@@ -218,6 +218,67 @@
           }
         ],
         "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.MaxPool1d.html#torch.nn.MaxPool1d"
+      },
+      "MaxPool2d": {
+        "formatted_name": "2D Max Pooling",
+        "parameters": [
+          {
+            "name": "kernel_size",
+            "type": ["int", "tuple"],
+            "description": "(int or tuple) \u2013 Size of the sliding window. Required.",
+            "default": null,
+            "required": true
+          },
+          {
+            "name": "stride",
+            "type": ["int", "tuple", "null"],
+            "description": "(int or tuple, optional) \u2013 Stride of the sliding window. Default: None.",
+            "default": null,
+            "required": false
+          },
+          {
+            "name": "padding",
+            "type": ["int", "tuple"],
+            "description": "(int or tuple, optional) \u2013 Zero-padding added to both sides of the input. Default: 0.",
+            "default": 0,
+            "required": false
+          },
+          {
+            "name": "dilation",
+            "type": ["int", "tuple"],
+            "description": "(int or tuple, optional) \u2013 Spacing between kernel elements. Default: 1.",
+            "default": 1,
+            "required": false
+          },
+          {
+            "name": "return_indices",
+            "type": ["bool"],
+            "description": "(bool, optional) \u2013 If True, will return the max indices along with the outputs. Useful for torch.nn.MaxUnpool2d later. Default: False.",
+            "default": false,
+            "required": false
+          },
+          {
+            "name": "ceil_mode",
+            "type": ["bool"],
+            "description": "(bool, optional) \u2013 When True, will use ceil instead of floor to compute the output shape. Default: False.",
+            "default": false,
+            "required": false
+          }
+        ],
+        "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.MaxPool2d.html#torch.nn.MaxPool2d"
+      },
+      "AdaptiveAvgPool2d": {
+        "formatted_name": "2D Adaptive Average Pooling",
+        "parameters": [
+          {
+            "name": "output_size",
+            "type": ["int", "tuple", "null"],
+            "description": "(int or tuple or null) \u2013 the target output size of the image of the form H x W. Can be a tuple (H, W) or a single H for a square image H x H. H and W can be either a int, or None which means the size will be the same as that of the input. Required.",
+            "default": null,
+            "required": true
+          }
+        ],
+        "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.AdaptiveAvgPool2d.html#torch.nn.AdaptiveAvgPool2d"
       }
     },
     "linear": {
@@ -261,6 +322,49 @@
           }
         ],
         "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.Linear.html#torch.nn.Linear"
+      }
+    },
+    "Normalization": {
+      "BatchNorm2d": {
+        "formatted_name": "2D Batch Normalization",
+        "parameters": [
+          {
+            "name": "num_features",
+            "type": ["int"],
+            "description": "(int) \u2013 C from an expected input of size (N, C, H, W). Required.",
+            "default": null,
+            "required": true
+          },
+          {
+            "name": "eps",
+            "type": ["float"],
+            "description": "(float) \u2013 a value added to the denominator for numerical stability. Default: 1e-5.",
+            "default": 1e-5,
+            "required": false
+          },
+          {
+            "name": "momentum",
+            "type": ["float", "null"],
+            "description": "(Optional[float]) \u2013 the value used for the running_mean and running_var computation. Can be set to None for cumulative moving average (i.e. simple average).  Default: 0.1.",
+            "default": 0.1,
+            "required": false
+          },
+          {
+            "name": "affine",
+            "type": ["bool"],
+            "description": "(bool) \u2013 a boolean value that when set to True, this module has learnable affine parameters. Default: True.",
+            "default": true,
+            "required": false
+          },
+          {
+            "name": "track_running_stats",
+            "type": ["bool"],
+            "description": "(bool) \u2013 a boolean value that when set to True, this module tracks the running mean and variance, and when set to False, this module does not track such statistics and always uses batch statistics in both training and eval modes. Default: True.",
+            "default": true,
+            "required": false
+          }
+        ],
+        "documentation": "https://pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html#torch.nn.BatchNorm2d"
       }
     }
   },

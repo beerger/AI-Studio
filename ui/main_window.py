@@ -132,3 +132,12 @@ class Ui_MainWindow(QObject):
         print("close event called")
         self.file_controller.close_main_window(event)
         
+    def wheelEvent(self, event):
+        """
+        Override the wheel event to zoom in and out.
+        """
+        # Zoom in or out
+        if event.angleDelta().y() > 0:
+            self.view_controller.zoom_in()
+        else:
+            self.view_controller.zoom_out()

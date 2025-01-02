@@ -56,8 +56,11 @@ class TabManager(QtWidgets.QWidget):
 
     def apply_stylesheet(self):
         """Apply the stylesheet with dynamically calculated tab width."""
-        tab_width = self.calculate_tab_width()
         # TODO: Pane color should not be hard coded (is currently same as the rest of the window color)
+        font = self.tab.font()
+        font.setPointSize(18)
+        self.tab.setFont(font)
+        tab_width = self.calculate_tab_width()
         self.tab.setStyleSheet(f"""
         QTabWidget::pane {{
             background-color: rgba(240, 240, 240, 255);
@@ -97,4 +100,5 @@ class TabManager(QtWidgets.QWidget):
     def calculate_tab_width(self):
         """Calculate the width of the longest tab, scaled for screen DPI."""
         base_width = max(self.tab.fontMetrics().boundingRect(self.tab.tabText(i)).width() for i in range(self.tab.count()))
+        print(f"Base width: {base_width}")
         return base_width + 50
