@@ -72,7 +72,6 @@ class AddComponentPopup(QtWidgets.QWidget):
         # Add documentation label
         documentation_label = QtWidgets.QLabel()
         documentation_label.setText(f"Click here for full documentation")
-        documentation_label.setStyleSheet("color: blue;")
         documentation_label.setOpenExternalLinks(True)
         documentation_label.mousePressEvent = partial(self.open_documenation, self.component_dict['documentation'])
         

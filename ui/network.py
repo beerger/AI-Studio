@@ -20,12 +20,13 @@ class Network(QtWidgets.QWidget):
         
         # Create a scroll area to wrap the layout
         self.scroll_area = QtWidgets.QScrollArea(self)
-        self.scroll_area.setStyleSheet("background-color: white;")  # Set the background color
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setAlignment(Qt.AlignCenter)   
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         # Create a container widget for the layout
         self.container = QtWidgets.QWidget()
+        self.container.setObjectName("NetworkContainer")
         self.container.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
         self.layout = QtWidgets.QHBoxLayout(self.container)
         self.layout.setSpacing(10)  # Adjust spacing between components
@@ -111,10 +112,8 @@ class Network(QtWidgets.QWidget):
 
     def scrollbars(self, scrollbars: bool) -> None:
         if scrollbars:
-            self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
             self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         else:
-            self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         
 
@@ -127,10 +126,9 @@ class Network(QtWidgets.QWidget):
 
         # Create a custom line using QLabel or QWidget
         line = QtWidgets.QWidget()
-        line.setAccessibleName("line")
+        line.setObjectName("NetworkConnectionLine")
         line.setFixedHeight(line_height)
         line.setFixedWidth(line_width)
-        line.setStyleSheet("background-color: black;")  # Set the color and thickness
         self.layout.addWidget(line)
 
     def resizeEvent(self, event):
@@ -153,7 +151,7 @@ class Network(QtWidgets.QWidget):
                 component_width = int(self.width() * 0.1 * scaling_factor * zoom)
                 child.setFixedSize(component_width, component_height)
             # Adjust line width
-            if child and child.accessibleName() == "line":
+            if child and child.objectName() == "NetworkConnectionLine":
                 line_height = max(1, int((self.height() * 0.3) // 150))
                 line_width = int((self.width() * 0.1) // 3)
                 child.setFixedSize(line_width, line_height)

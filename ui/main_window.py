@@ -13,7 +13,6 @@ from core.components import WRAPPER_REGISTRY
 from core.signal_manager import SignalManager
 from core.model_manager import ModelManager
 from core.shortcut_handler import ShortcutHandler
-from styling.color_scheme import ColorScheme
 import os
 
 class Ui_MainWindow(QObject):
@@ -34,6 +33,11 @@ class Ui_MainWindow(QObject):
         self.init_layout(MainWindow)
         self.init_status_bar(MainWindow)
         self.setup_shortcuts() # Requires centralwidget to be set
+        
+        # Apply the theme after setting up the UI
+        theme_file = os.path.join("themes", "standard_theme.qss")
+        self.apply_theme(theme_file)
+        
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -48,6 +52,11 @@ class Ui_MainWindow(QObject):
         # Set the window icon
         icon = file_helper.create_icon('company_logo.png')
         MainWindow.setWindowIcon(icon)
+        
+    def apply_theme(self, theme_file):
+        with open(theme_file, 'r') as f:
+            style = f.read()
+        QtWidgets.QApplication.instance().setStyleSheet(style)
 
     def init_layout(self, MainWindow):
         """
@@ -82,6 +91,7 @@ class Ui_MainWindow(QObject):
         dock_network_layout.addWidget(self.network, stretch=4)
         
         main_v_layout.addLayout(dock_network_layout, stretch=9) # stretch=9
+
         
         # Dock for dataloader
         dataloader_dock_widget = QtWidgets.QDockWidget(self.centralwidget)

@@ -55,18 +55,6 @@ class BaseTab(QtWidgets.QWidget):
                 action_label.setWordWrap(True)
                 container_layout.addWidget(action_label, QtCore.Qt.AlignBottom)
 
-                # Apply hover style
-                container.setStyleSheet("""
-                    QFrame#hoverContainer {
-                        border: none;
-                        background-color: transparent;
-                    }
-                    QFrame#hoverContainer:hover {
-                        border: 2px solid lightGray;
-                        border-radius: 4px;
-                    }
-                """)
-
                 # Connect action signals
                 container.mousePressEvent = lambda event, sig=action['signal']: getattr(self.signal_manager, sig).emit()
 
