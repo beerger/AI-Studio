@@ -38,3 +38,5 @@ class SignalManager(QObject):
     visualization_settings_signal = pyqtSignal(dict)
     component_added_signal = pyqtSignal(dict)
     update_visualization_signal = pyqtSignal()
+
+    apply_scaling = pyqtSignal(float)

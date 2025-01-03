@@ -70,7 +70,7 @@ class ToolsController:
             # Connect exporter signals
             exporter.progress_signal.connect(progress_dialog.setValue)
             exporter.success_signal.connect(lambda: QtWidgets.QMessageBox.information(None, "Export", "Model successfully exported to ONNX"))
-            exporter.error_signal.connect(lambda msg: self.handle_error(msg, values))
+            exporter.error_signal.connect(lambda msg: self.handle_onnx_error(msg, values))
             exporter.finished.connect(progress_dialog.close)  # Close progress dialog on completion
             progress_dialog.canceled.connect(exporter.terminate)  # Allow canceling export
 
@@ -80,7 +80,7 @@ class ToolsController:
             # Show progress dialog
             progress_dialog.exec_()
 
-    def handle_error(self, error_message: str, values: dict):
+    def handle_onnx_error(self, error_message: str, values: dict):
         """
         Handles errors during export and shows the error popup.
         """

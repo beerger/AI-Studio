@@ -28,19 +28,19 @@ class ViewController:
         self.current_settings['show'] = not self.current_settings['show']
         self.signal_manager.visualization_settings_signal.emit(self.current_settings)
     
-    def zoom_in(self) -> None:
+    def zoom_in(self, zoom=0.1) -> None:
         """
         Zooms in on the network visualization.
         """
-        zoom = min(5, self.current_settings['zoom'] + 0.1) # Ensure zoom is at most 5
+        zoom = min(5, self.current_settings['zoom'] + zoom) # Ensure zoom is at most 5
         self.current_settings['zoom'] = zoom
         self.signal_manager.visualization_settings_signal.emit(self.current_settings)
     
-    def zoom_out(self) -> None:
+    def zoom_out(self, zoom=0.1) -> None:
         """
         Zooms out on the network visualization.
         """
-        zoom = max(0.2, 0, self.current_settings['zoom'] - 0.1) # Ensure zoom is at least 0.2
+        zoom = max(0.2, 0, self.current_settings['zoom'] - zoom) # Ensure zoom is at least 0.2
         self.current_settings['zoom'] = zoom
         self.signal_manager.visualization_settings_signal.emit(self.current_settings)
     

@@ -39,7 +39,7 @@ class ONNXExporter(QtCore.QThread):
             torch_model = tmp_module.MyModel()
             self.progress_signal.emit(50)
 
-            # Extract values from popup
+            # Extract values
             batch_size = self.values['batch_size']
             channels = self.values['channels']
             height = self.values['height']
