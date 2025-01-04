@@ -1,0 +1,205 @@
+/* General Styles */
+QWidget {
+    color: PRIMARY_TEXT;
+    font: 10pt "Segoe UI";
+    background-color: PRIMARY_BACKGROUND;
+}
+
+/* Tooltips */
+QToolTip {
+	color: #ffffff;
+	background-color: TOOLTIP_BACKGROUND;
+	border: 1px solid DEFAULT_BORDER;
+	background-image: none;
+	background-position: left center;
+    background-repeat: no-repeat;
+	border: none;
+	border-left: 2px solid HIGHLIGHT_BORDER;
+	text-align: left;
+	padding-left: 8px;
+	margin: 0px;
+}
+
+/* QPushButton */
+QPushButton {
+    background-color: BUTTON_BACKGROUND;
+    border: 2px solid BUTTON_BACKGROUND;
+    border-radius: 5px;
+}
+QPushButton:hover {
+    background-color: BUTTON_HOVER_BACKGROUND;
+    border: 2px solid BUTTON_HOVER_BORDER;
+}
+QPushButton:pressed {
+    background-color: BUTTON_PRESSED_BACKGROUND;
+    border: 2px solid BUTTON_PRESSED_BORDER;
+}
+
+/* QLineEdit */
+QLineEdit {
+    background-color: SECONDARY_BACKGROUND;
+    border: 2px solid SECONDARY_BACKGROUND;
+    border-radius: 5px;
+    selection-color: HIGHLIGHT_TEXT;
+    selection-background-color: SELECTION_TEXT;
+}
+QLineEdit:hover {
+    border: 2px solid HOVER_BORDER;
+}
+QLineEdit:focus {
+    border: 2px solid FOCUS_BORDER;
+}
+QLineEdit:disabled {
+    background-color:
+}
+
+
+/* QScrollArea */
+QScrollArea {
+    background-color: SECONDARY_BACKGROUND;
+    border: none;
+}
+
+/* QScrollBar */
+QScrollBar {
+    background: rgb(52, 59, 72);
+    border-radius: 0px;
+}
+QScrollBar::handle {
+    background: qlineargradient(
+        x1: 0, y1: 1, x2: 1, y2: 1,
+        stop: 0 SCROLL_HANDLE_START,
+        stop: 1 SCROLL_HANDLE_END
+    );
+    border-radius: 4px;
+}
+QScrollBar::add-line,
+QScrollBar::sub-line {
+    background: rgb(55, 63, 77);
+    border-radius: 4px;
+}
+
+QScrollBar::groove {
+    background: SCROLL_GROOVE_BACKGROUND; /* Match theme's dark background */
+    border: none;
+}
+
+
+/* QSlider */
+QSlider::groove {
+    background-color: SLIDER_GROOVE;
+    border-radius: 5px;
+}
+QSlider::handle {
+    background-color: SLIDER_HANDLE;
+    border-radius: 5px;
+}
+
+
+/* QCheckBox */
+QCheckBox::indicator {
+    background: SECONDARY_BACKGROUND;
+    border: 3px solid DEFAULT_BORDER;
+    border-radius: 10px;
+}
+
+/* QRadioButton */
+QRadioButton::indicator {
+    background: SECONDARY_BACKGROUND;
+    border: 3px solid DEFAULT_BORDER;
+    border-radius: 10px;
+}
+
+/* QComboBox */
+QComboBox{
+	background-color: SECONDARY_BACKGROUND;
+	border-radius: 5px;
+	border: 2px solid DEFAULT_BORDER;
+	padding: 5px;
+	padding-left: 10px;
+}
+QComboBox:hover{
+	border: 2px solid HOVER_BORDER;
+}
+QComboBox::drop-down {
+	subcontrol-origin: padding;
+	subcontrol-po   sition: top right;
+	width: 25px; 
+	border-left-width: 3px;
+	border-left-color: COMBO_BOX_SEPARATOR;
+	border-left-style: solid;
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;	
+	background-position: center;
+	background-repeat: no-reperat;
+ }
+QComboBox QAbstractItemView {
+	color: SCROLL_HANDLE_START;	
+	background-color: DEFAULT_BORDER;
+	selection-background-color: COMBO_BOX_SELECTION;
+}
+
+/* QTabWidget Pane */
+QTabWidget {
+    background-color: SECONDARY_BACKGROUND;
+}
+
+QTabWidget::pane {
+    background-color: SECONDARY_BACKGROUND; /* Dark Gray */
+    border: 0px solid lightGray;
+    border-bottom: 1px solid TAB_WIDGET_PANE_BORDER; /* Subtle gray border */
+}
+
+/* QTabBar Background */
+QTabBar {
+    background-color: SECONDARY_BACKGROUND; /* Matches app background */
+}
+
+/* Default Tab */
+QTabBar::tab {
+    background: SECONDARY_BACKGROUND
+    color: PRIMARY_TEXT; /* Light Gray Text */
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+}
+
+/* Hovered Tab */
+QTabBar::tab:hover {
+    background: PRIMARY_BACKGROUND;
+    color: rgb(221, 221, 221); /* Light Gray Text */
+}
+
+/* Selected Tab */
+QTabBar::tab:selected {
+    background: HIGHLIGHT_BACKGROUND; /* Light Gray */
+    color: PRIMARY_TEXT; /* Light Gray Text */
+    border-bottom: 2px solid HIGHLIGHT_BORDER;
+}
+
+QTabBar::tab:pressed {
+    background: HIGHLIGHT_BACKGROUND;
+}
+
+/* These two sets the border around the container in each tab pane. 
+The container consists of the icon and the label. */
+QWidget#hoverContainer {
+    border: none;
+    background-color: transparent;
+}
+
+QWidget#hoverContainer:hover {
+    border: 2px;
+    border-color: HIGHLIGHT_BORDER;
+    border-radius: 4px;
+}
+/* Network visualization */
+/* Container from network is a QWidget, we need to override the color set for QWidget in this theme */
+
+#NetworkContainer {
+    background-color: SECONDARY_BACKGROUND;
+}
+
+#NetworkConnectionLine {
+    background-color: NETWORK_CONNECTION_LINE;
+}
+
