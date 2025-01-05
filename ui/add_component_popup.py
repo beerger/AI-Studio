@@ -1,15 +1,15 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
 from utils.file_helper import load_json
-from core.signal_manager import SignalManager
+from PyQt5.QtWidgets import QDialog
+from ui.popups.frameless_popup import FrameLessPopup
 
-class AddComponentPopup(QtWidgets.QWidget):
-    def __init__(self, component_dict, signal_manager, parent=None):
+class AddComponentPopup(FrameLessPopup):
+    def __init__(self, component_dict, parent=None):
         super().__init__(parent)
-        self.setWindowFlags(QtCore.Qt.Window) # Make it a top-level window
-        self.setWindowTitle("New Component")
+        #self.setWindowFlags(QtCore.Qt.Window) # Make it a top-level window
+        self.title_label.setText("Add Component")
         self.component_dict = component_dict
-        self.signal_manager = signal_manager
         self.input_widgets = []
         self.args = {}
 
@@ -20,12 +20,11 @@ class AddComponentPopup(QtWidgets.QWidget):
         self.init_ui()
         
     def init_ui(self):
-        vertical_layout = QtWidgets.QVBoxLayout(self)
 
         self.description_label = QtWidgets.QLabel()
         self.description_label.setWordWrap(True)  # Allow wrapping for long text
         self.description_label.setText("Click on a parameter label to see its description.")
-        vertical_layout.addWidget(self.description_label)
+        self.content_layout.addWidget(self.description_label)
 
         # Create grid layout for parameters
         grid_layout = QtWidgets.QGridLayout()
@@ -67,21 +66,22 @@ class AddComponentPopup(QtWidgets.QWidget):
             grid_layout.addWidget(input_widget, i, 1)
             self.input_widgets.append(input_widget)
 
-        vertical_layout.addLayout(grid_layout)
+        self.content_layout.addLayout(grid_layout)
 
         # Add documentation label
         documentation_label = QtWidgets.QLabel()
         documentation_label.setText(f"Click here for full documentation")
+        documentation_label.setObjectName("LinkLabel")
         documentation_label.setOpenExternalLinks(True)
         documentation_label.mousePressEvent = partial(self.open_documenation, self.component_dict['documentation'])
         
-        vertical_layout.addWidget(documentation_label)
+        self.content_layout.addWidget(documentation_label)
         
         # Add button
         button = QtWidgets.QPushButton("Add Component")
         button.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         button.clicked.connect(self.clicked_add_component)
-        vertical_layout.addWidget(button)
+        self.content_layout.addWidget(button)
         
     def get_args(self):
         return self.args
@@ -119,9 +119,10 @@ class AddComponentPopup(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "Invalid Parameters", f"Invalid parameters: {', '.join(invalid_params)}")
             self.args = {}
         else:
-            # Emit the signal with the collected arguments
-            self.signal_manager.component_added_signal.emit(self.args)
-            self.close()
+            self.accept()
+    
+    def get_args(self):
+        return self.args
 
     def parse_value(self, value, param_info):
         """

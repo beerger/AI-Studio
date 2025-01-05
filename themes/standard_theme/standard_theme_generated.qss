@@ -1,20 +1,20 @@
 /* General Styles */
 QWidget {
-    color: PRIMARY_TEXT;
+    color: rgb(221, 221, 221);
     font: 10pt "Segoe UI";
-    background-color: PRIMARY_BACKGROUND;
+    background-color: rgb(40, 44, 52);
 }
 
 /* Tooltips */
 QToolTip {
 	color: #ffffff;
-	background-color: TOOLTIP_BACKGROUND;
-	border: 1px solid DEFAULT_BORDER;
+	background-color: rgba(33, 37, 43, 180);
+	border: 1px solid rgb(44, 49, 58);
 	background-image: none;
 	background-position: left center;
     background-repeat: no-repeat;
 	border: none;
-	border-left: 2px solid HIGHLIGHT_BORDER;
+	border-left: 2px solid rgb(255, 121, 198);
 	text-align: left;
 	padding-left: 8px;
 	margin: 0px;
@@ -22,32 +22,32 @@ QToolTip {
 
 /* QPushButton */
 QPushButton {
-    background-color: BUTTON_BACKGROUND;
-    border: 2px solid BUTTON_BACKGROUND;
+    background-color: rgb(52, 59, 72);
+    border: 2px solid rgb(52, 59, 72);
     border-radius: 5px;
 }
 QPushButton:hover {
-    background-color: BUTTON_HOVER_BACKGROUND;
-    border: 2px solid BUTTON_HOVER_BORDER;
+    background-color: rgb(57, 65, 80);
+    border: 2px solid rgb(61, 70, 86);
 }
 QPushButton:pressed {
-    background-color: BUTTON_PRESSED_BACKGROUND;
-    border: 2px solid BUTTON_PRESSED_BORDER;
+    background-color: rgb(35, 40, 49);
+    border: 2px solid rgb(43, 50, 61);
 }
 
 /* QLineEdit */
 QLineEdit {
-    background-color: SECONDARY_BACKGROUND;
-    border: 2px solid SECONDARY_BACKGROUND;
+    background-color: rgb(33, 37, 43);
+    border: 2px solid rgb(33, 37, 43);
     border-radius: 5px;
-    selection-color: HIGHLIGHT_TEXT;
-    selection-background-color: SELECTION_TEXT;
+    selection-color: rgb(255, 255, 255);
+    selection-background-color: rgb(255, 121, 198);
 }
 QLineEdit:hover {
-    border: 2px solid HOVER_BORDER;
+    border: 2px solid rgb(64, 71, 88);
 }
 QLineEdit:focus {
-    border: 2px solid FOCUS_BORDER;
+    border: 2px solid rgb(91, 101, 124);
 }
 QLineEdit:disabled {
     background-color:
@@ -55,17 +55,17 @@ QLineEdit:disabled {
 
 /* QTextEdit */
 QTextEdit {
-    background-color: SECONDARY_BACKGROUND;
-    border: 2px solid SECONDARY_BACKGROUND;
+    background-color: rgb(33, 37, 43);
+    border: 2px solid rgb(33, 37, 43);
     border-radius: 5px;
-    selection-color: HIGHLIGHT_TEXT;
-    selection-background-color: SELECTION_TEXT;
+    selection-color: rgb(255, 255, 255);
+    selection-background-color: rgb(255, 121, 198);
 }
 QTextEdit:hover {
-    border: 2px solid HOVER_BORDER;
+    border: 2px solid rgb(64, 71, 88);
 }
 QTextEdit:focus {
-    border: 2px solid FOCUS_BORDER;
+    border: 2px solid rgb(91, 101, 124);
 }
 QTextEdit:disabled {
     background-color:
@@ -74,7 +74,7 @@ QTextEdit:disabled {
 
 /* QScrollArea */
 QScrollArea {
-    background-color: SECONDARY_BACKGROUND;
+    background-color: rgb(33, 37, 43);
     border: none;
 }
 
@@ -165,46 +165,46 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 
 /* QSlider */
 QSlider::groove {
-    background-color: SLIDER_GROOVE;
+    background-color: rgb(52, 59, 72);
     border-radius: 5px;
 }
 QSlider::handle {
-    background-color: SLIDER_HANDLE;
+    background-color: rgb(189, 147, 249);
     border-radius: 5px;
 }
 
 
 /* QCheckBox */
 QCheckBox::indicator {
-    background: SECONDARY_BACKGROUND;
-    border: 3px solid DEFAULT_BORDER;
+    background: rgb(33, 37, 43);
+    border: 3px solid rgb(44, 49, 58);
     border-radius: 10px;
 }
 
 /* QRadioButton */
 QRadioButton::indicator {
-    background: SECONDARY_BACKGROUND;
-    border: 3px solid DEFAULT_BORDER;
+    background: rgb(33, 37, 43);
+    border: 3px solid rgb(44, 49, 58);
     border-radius: 10px;
 }
 
 /* QComboBox */
 QComboBox{
-	background-color: SECONDARY_BACKGROUND;
+	background-color: rgb(33, 37, 43);
 	border-radius: 5px;
-	border: 2px solid DEFAULT_BORDER;
+	border: 2px solid rgb(44, 49, 58);
 	padding: 5px;
 	padding-left: 10px;
 }
 QComboBox:hover{
-	border: 2px solid HOVER_BORDER;
+	border: 2px solid rgb(64, 71, 88);
 }
 QComboBox::drop-down {
 	subcontrol-origin: padding;
 	subcontrol-position: top right;
 	width: 25px; 
 	border-left-width: 3px;
-	border-left-color: COMBO_BOX_SEPARATOR;
+	border-left-color: rgba(39, 44, 54, 150);
 	border-left-style: solid;
 	border-top-right-radius: 3px;
 	border-bottom-right-radius: 3px;	
@@ -214,32 +214,32 @@ QComboBox::drop-down {
  }
 
 QComboBox QAbstractItemView {
-	color: SCROLL_HANDLE_START;	
-	background-color: DEFAULT_BORDER;
+	color: rgb(189, 147, 249);	
+	background-color: rgb(44, 49, 58);
     
-	selection-background-color: COMBO_BOX_SELECTION;
+	selection-background-color: rgb(33, 37, 43);
 }
 
 /* QTabWidget Pane */
 QTabWidget {
-    background-color: SECONDARY_BACKGROUND;
+    background-color: rgb(33, 37, 43);
 }
 
 QTabWidget::pane {
-    background-color: SECONDARY_BACKGROUND; /* Dark Gray */
+    background-color: rgb(33, 37, 43); /* Dark Gray */
     border: 0px solid lightGray;
-    border-bottom: 4px solid PANE_BORDER; /* Subtle gray border */
+    border-bottom: 4px solid rgb(44, 49, 58); /* Subtle gray border */
 }
 
 /* QTabBar Background */
 QTabBar {
-    background-color: SECONDARY_BACKGROUND; /* Matches app background */
+    background-color: rgb(33, 37, 43); /* Matches app background */
 }
 
 /* Default Tab */
 QTabBar::tab {
-    background: SECONDARY_BACKGROUND;
-    color: PRIMARY_TEXT; /* Light Gray Text */
+    background: rgb(33, 37, 43);
+    color: rgb(221, 221, 221); /* Light Gray Text */
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
 }
@@ -248,27 +248,27 @@ QTabWidget::tab-bar {background: rgb(0, 255, 255);}
 
 /* Hovered Tab */
 QTabBar::tab:hover {
-    background: PRIMARY_BACKGROUND;
+    background: rgb(40, 44, 52);
     color: rgb(221, 221, 221); /* Light Gray Text */
     margin-top: 5px;
 }
 
 /* Selected Tab */
 QTabBar::tab:selected {
-    background: PRIMARY_BACKGROUND; /* Light Gray */
-    color: PRIMARY_TEXT; /* Light Gray Text */
-    border-bottom: 2px solid HIGHLIGHT_BORDER;
+    background: rgb(40, 44, 52); /* Light Gray */
+    color: rgb(221, 221, 221); /* Light Gray Text */
+    border-bottom: 2px solid rgb(255, 121, 198);
     margin-top: 5px; /* make selected tabs look smaller */
 }
 
 QTabBar::tab:pressed {
-    background: HIGHLIGHT_BACKGROUND;
+    background: rgb(189, 147, 249);
 }
 
 /* Status Bar */
 
 QStatusBar {
-    background-color: STATUS_BAR;
+    background-color: rgb(44, 49, 58);
 }
 
 /* These two sets the border around the container in each tab pane. 
@@ -279,7 +279,7 @@ The container consists of the icon and the label. */
 }
 
 #hoverContainer:hover {
-    border: 2px solid DEFAULT_BORDER;
+    border: 2px solid rgb(44, 49, 58);
     border-radius: 4px;
 }
 
@@ -287,46 +287,46 @@ The container consists of the icon and the label. */
 /* Container from network is a QWidget, we need to override the color set for QWidget in this theme */
 
 #NetworkContainer {
-    background-color: SECONDARY_BACKGROUND;
+    background-color: rgb(33, 37, 43);
 }
 
 #NetworkScrollArea {
-    border: 2px solid DEFAULT_BORDER;
+    border: 2px solid rgb(44, 49, 58);
     border-radius: 5px;
 }
 
 #NetworkConnectionLine {
-    background-color: NETWORK_CONNECTION_LINE;
+    background-color: rgb(255, 121, 198);
 }
 
 #categorySeparator {
-    color: CATEGORY_DIVIDER;
+    color: rgb(44, 49, 58);
 }
 
 #ComponentTree {
-    border: 2px solid DEFAULT_BORDER;
+    border: 2px solid rgb(44, 49, 58);
     border-radius: 5px;
 }
 
 /* Hover effect for items in the ComponentTree */
 #ComponentTree::item:hover {
-    background: SECONDARY_BACKGROUND;
+    background: rgb(33, 37, 43);
 }
 
 #ComponentTree::item:selected:!active {
-    background: HIGHLIGHT_BACKGROUND;
+    background: rgb(189, 147, 249);
 }
 
 #FramelessPopupTitle {
-    color: PRIMARY_TEXT;
-    background-color: SECONDARY_BACKGROUND;
+    color: rgb(221, 221, 221);
+    background-color: rgb(33, 37, 43);
 }
 
 #FramelessPopupTitleBar {
-    background-color: SECONDARY_BACKGROUND;
+    background-color: rgb(33, 37, 43);
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    border-bottom: 2px solid PANE_BORDER;
+    border-bottom: 2px solid rgb(44, 49, 58);
 }
 
 #FramelessPopupCloseButton {
@@ -335,51 +335,51 @@ The container consists of the icon and the label. */
 }
 
 #FramelessPopupCloseButton:hover {
-    background-color: BUTTON_HOVER_BACKGROUND;
-    border: 2px solid BUTTON_HOVER_BORDER;
+    background-color: rgb(57, 65, 80);
+    border: 2px solid rgb(61, 70, 86);
 }
 
 #defaultBorder {
-    border: DEFAULT_BORDER;
+    border: rgb(44, 49, 58);
 }
 
 #LinkLabel {
-    color: LINK_LABEL;
+    color: rgb(189, 147, 249);
 }
 
 #customProgressBar {
-    background: SECONDARY_BACKGROUND;
-    border: 4px solid DEFAULT_BORDER;
+    background: rgb(33, 37, 43);
+    border: 4px solid rgb(44, 49, 58);
     border-radius: 12px;
     text-align: center;
-    color: PRIMARY_TEXT;
+    color: rgb(221, 221, 221);
 }
 
 #customProgressBar::chunk {
     background: qlineargradient(
     x1: 0, y1: 0, x2: 1, y2: 0,
-    stop: 0 HIGHLIGHT_BACKGROUND,
-    stop: 1 HIGHLIGHT_BORDER
+    stop: 0 rgb(189, 147, 249),
+    stop: 1 rgb(255, 121, 198)
     );
     border-radius: 10px;
 }
 
 #titleBar {
-    background-color: STATUS_BAR;
+    background-color: rgb(44, 49, 58);
 }
 
 #titleBarButton {
-    color: PRIMARY_TEXT;
-    background-color: STATUS_BAR;
+    color: rgb(221, 221, 221);
+    background-color: rgb(44, 49, 58);
     border: none;
 }
 
 #titleBarButton:hover {
-    background-color: BUTTON_HOVER_BACKGROUND;
-    border: 2px solid BUTTON_HOVER_BORDER;
+    background-color: rgb(57, 65, 80);
+    border: 2px solid rgb(61, 70, 86);
 }
 
 
 #titleLabel {
-    background-color: STATUS_BAR;
+    background-color: rgb(44, 49, 58);
 }

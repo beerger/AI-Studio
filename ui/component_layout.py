@@ -19,6 +19,7 @@ class ComponentLayoutWidget(QtWidgets.QWidget):
         
         # Create a QTreeWidget
         self.tree_widget = QtWidgets.QTreeWidget()
+        self.tree_widget.setObjectName("ComponentTree")
         self.tree_widget.setHeaderHidden(True)  # Hide the header
         layout.addWidget(self.tree_widget)
 
@@ -62,12 +63,6 @@ class ComponentLayoutWidget(QtWidgets.QWidget):
             item = item.parent()  # Move to the parent item
         return path
     
-    def close_existing_popup(self):
-        """Close the existing popup if it's open."""
-        if hasattr(self, "popup") and self.popup:
-            self.popup.close()
-            self.popup = None
-    
     def on_popup_closed(self, obj):
         """Reset the popup reference when the popup is closed."""
         self.popup = None
@@ -80,28 +75,14 @@ class ComponentLayoutWidget(QtWidgets.QWidget):
         if not (item.flags() & QtCore.Qt.ItemIsSelectable):
             return
         
-        # Close the existing popup if it's open
-        self.close_existing_popup()
-
         component_dict = get_value_from_json(self.components_json, self.get_full_json_path(item))
         raw_name = item.data(0, QtCore.Qt.UserRole) 
         
-        self.popup = AddComponentPopup(component_dict, self.signal_manager, parent=self)
-        
-        # Disconnect existing connections to avoid duplicates
-        # Since the SignalOwner class owns the signal
-        try:
-            self.signal_manager.component_added_signal.disconnect()
-        except TypeError:
-            # If no connections exist, it's safe to ignore this
-            pass
-        
-        # Connect the custom signal to the slot method
-        self.signal_manager.component_added_signal.connect(partial(self.handle_component_added, raw_name))
-        self.popup.show()
-
-        # Ensure the popup reference is reset when closed
-        self.popup.destroyed.connect(self.on_popup_closed)
+        popup = AddComponentPopup(component_dict, parent=self)
+        if popup.exec_() == QtWidgets.QDialog.Accepted:
+            self.handle_component_added(raw_name, popup.get_args())
+        # clear selection
+        self.tree_widget.clearSelection()
         
     def handle_component_added(self, raw_name, args):
         """

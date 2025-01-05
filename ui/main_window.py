@@ -14,6 +14,8 @@ from core.signal_manager import SignalManager
 from core.model_manager import ModelManager
 from core.shortcut_handler import ShortcutHandler
 import os
+import PyQt5.QtGui as QtGui
+from PyQt5.QtCore import Qt
 
 class Ui_MainWindow(QObject):
     
@@ -24,20 +26,36 @@ class Ui_MainWindow(QObject):
         self.model_manager = ModelManager.load_from_session_state(SessionState())
         self.signal_manager = signal_manager if signal_manager else SignalManager()
         self.setup_controllers()
+        self.dragging = False # Track dragging state for frameless window
         
     def setupUi(self, MainWindow):
         """
         Sets up the main window layout, components, and functionality.
         """
         self.init_main_window(MainWindow)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setContentsMargins(0, 0, 0, 0)
+        MainWindow.setCentralWidget(self.centralwidget)
+
+        # Main vertical layout
+        self.main_v_layout = QtWidgets.QVBoxLayout(self.centralwidget)
+        self.main_v_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_v_layout.setSpacing(0)
+
+        # Add custom title bar
+        self.add_custom_title_bar(MainWindow)
+
+        # Add the rest of the layout
         self.init_layout(MainWindow)
+
+        # Initialize other components
         self.init_status_bar(MainWindow)
-        self.setup_shortcuts() # Requires centralwidget to be set
-        
+        self.setup_shortcuts()
+
         # Apply the theme after setting up the UI
-        theme_file = os.path.join("themes", "standard_theme.qss")
+        theme_file = os.path.join("themes", "standard_theme", "standard_theme_generated.qss")
         self.apply_theme(theme_file)
-        
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -46,9 +64,15 @@ class Ui_MainWindow(QObject):
         Initializes the main window properties.
         """
         MainWindow.setObjectName("MainWindow")
-        MainWindow.setGeometry(QtCore.QRect(0, 0, int(2000 * self.scaling_factor), int(600 * self.scaling_factor)))
+        MainWindow.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        MainWindow.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        MainWindow.setGeometry(QtCore.QRect(0, 0, int(1200 * self.scaling_factor), int(600 * self.scaling_factor)))
         MainWindow.showMaximized()
 
+        #cursor_pixmap = QtGui.QPixmap("D:/OneDrive - Uppsala universitet/General/AI-Studio/resources/icons/cursor_3d.png")
+        #scaled_cursor_pixmap = cursor_pixmap.scaled(24, 24, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        #custom_cursor = QtGui.QCursor(scaled_cursor_pixmap, 0, 0)  # Hotspot at top-left corner
+        #MainWindow.setCursor(custom_cursor)
         # Set the window icon
         icon = file_helper.create_icon('company_logo.png')
         MainWindow.setWindowIcon(icon)
@@ -57,56 +81,122 @@ class Ui_MainWindow(QObject):
         with open(theme_file, 'r') as f:
             style = f.read()
         QtWidgets.QApplication.instance().setStyleSheet(style)
+        
+        
+    def add_custom_title_bar(self, MainWindow):
+        """
+        Adds a custom title bar with minimize, maximize, and close buttons.
+        """
+        self.main_window = MainWindow  # Store the reference to MainWindow
+        self.title_bar = QtWidgets.QWidget()
+        #call toggle_maximize when double click on title bar
+        self.title_bar.mouseDoubleClickEvent = self.toggle_maximize
+        
+        self.title_bar.setObjectName("titleBar")
+        self.title_bar_layout = QtWidgets.QHBoxLayout(self.title_bar)
+        self.title_bar_layout.setContentsMargins(10, 0, 10, 0)
+    
+        # Add title
+        self.title_icon = QtWidgets.QLabel()
+        icon = file_helper.create_icon('company_logo.png')
+        self.title_icon.setPixmap(icon.pixmap(16, 16))
+        self.title_icon.setStyleSheet("background-color: transparent;")
+        self.title_bar_layout.addWidget(self.title_icon, alignment=QtCore.Qt.AlignLeft)
+        
+
+        self.titel_label = QtWidgets.QLabel("AI Studio")
+        self.titel_label.setObjectName("titleLabel")
+        self.title_bar_layout.addWidget(self.titel_label, alignment=QtCore.Qt.AlignLeft)
+        
+        # Add a spacer to push buttons to the right
+        spacer = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.title_bar_layout.addSpacerItem(spacer)
+        
+        # Add buttons
+        self.minimize_button = QtWidgets.QPushButton("-")
+        self.minimize_button.setObjectName("titleBarButton")
+        self.minimize_button.setFixedSize(20, 20)
+        self.minimize_button.clicked.connect(self.main_window.showMinimized)
+    
+        self.maximize_button = QtWidgets.QPushButton("+")
+        self.maximize_button.setObjectName("titleBarButton")
+        
+        self.maximize_button.setFixedSize(20, 20)
+        self.maximize_button.clicked.connect(self.toggle_maximize)
+    
+        self.close_button = QtWidgets.QPushButton("x")
+        self.close_button.setObjectName("titleBarButton")
+        self.close_button.setFixedSize(20, 20)
+        self.close_button.clicked.connect(self.main_window.close)
+
+        self.title_bar_layout.addWidget(self.minimize_button, alignment=QtCore.Qt.AlignRight)
+        self.title_bar_layout.addWidget(self.maximize_button, alignment=QtCore.Qt.AlignRight)
+        self.title_bar_layout.addWidget(self.close_button, alignment=QtCore.Qt.AlignRight)
+    
+        # Enable dragging
+        self.title_bar.mousePressEvent = self.start_drag
+        self.title_bar.mouseMoveEvent = self.perform_drag
+        self.title_bar.mouseReleaseEvent = self.stop_drag
+    
+        # Add the title bar to the main layout
+        self.main_v_layout.addWidget(self.title_bar, stretch=2)
+
+        
+    def start_drag(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            self.dragging = True
+            self.drag_start_position = event.globalPos() - self.main_window.frameGeometry().topLeft()
+            event.accept()
+
+    def perform_drag(self, event):
+        if self.dragging and event.buttons() == QtCore.Qt.LeftButton:
+            self.main_window.move(event.globalPos() - self.drag_start_position)
+            event.accept()
+
+    def stop_drag(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            self.dragging = False
+            event.accept()
+
+            
+    def toggle_maximize(self, event):
+        if self.main_window.isMaximized():
+            self.main_window.showNormal()
+        else:
+            print("show max")
+            self.main_window.showMaximized()
 
     def init_layout(self, MainWindow):
         """
         Sets up the main layout and adds widgets.
         """
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        self.centralwidget.setContentsMargins(0, 0, 0, 0) # Remove central widget margins
-        # Main vertical layout
-        main_v_layout = QtWidgets.QVBoxLayout(self.centralwidget)
-        main_v_layout.setContentsMargins(0, 0, 0, 0)  # Remove margins
-        main_v_layout.setSpacing(0)  # Remove spacing
-        
         # Tab manager widget
         self.tab_manager = TabManager(self.signal_manager, scaling_factor=self.scaling_factor)
         self.tab_manager.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        main_v_layout.addWidget(self.tab_manager, stretch=1) # stretch=1
-        
+        self.main_v_layout.addWidget(self.tab_manager, stretch=10)  # Add tab manager below title bar
+
+        # Components dock widget
         components_dock_widget = QtWidgets.QDockWidget(self.centralwidget)
         components_widget = ComponentLayoutWidget(self.signal_manager)
         components_dock_widget.setWidget(components_widget)
         components_dock_widget.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        
+        components_dock_widget.setMinimumSize(QtCore.QSize(200, 200))
+        components_dock_widget.setMaximumSize(QtCore.QSize(1000, 1000))
+
         # Layout for the component dock widget and network visualization
         dock_network_layout = QtWidgets.QHBoxLayout()
-        dock_network_layout.addWidget(components_dock_widget, stretch=1) 
+        dock_network_layout.addWidget(components_dock_widget, stretch=1)
 
         # Add network visualization widget
         self.network = Network(self.signal_manager)
         self.network.wheelEvent = self.wheelEvent  # Override wheel event
         self.network.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         dock_network_layout.addWidget(self.network, stretch=4)
-        
-        main_v_layout.addLayout(dock_network_layout, stretch=9) # stretch=9
 
-        
-        # Dock for dataloader
-        dataloader_dock_widget = QtWidgets.QDockWidget(self.centralwidget)
-        dataloader_widget = QtWidgets.QLabel("Dataloader")
-        dataloader_dock_widget.setWidget(dataloader_widget)
-        
-        # Dock for configuration
-        configuration_dock_widget = QtWidgets.QDockWidget(self.centralwidget)
-        configuration_widget = QtWidgets.QLabel("Configuration")
-        configuration_dock_widget.setWidget(configuration_widget)
-
-        MainWindow.setCentralWidget(self.centralwidget)
-        MainWindow.addDockWidget(QtCore.Qt.LeftDockWidgetArea, components_dock_widget)
-        MainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, dataloader_dock_widget)
-        MainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, configuration_dock_widget)
+        # Add layout to the main layout
+        dock_network_widget = QtWidgets.QWidget()
+        dock_network_widget.setLayout(dock_network_layout)
+        self.main_v_layout.addWidget(dock_network_widget, stretch=90)
 
     def init_status_bar(self, MainWindow):
         """

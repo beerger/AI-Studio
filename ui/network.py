@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt, QTimer
 from core.model_manager import ModelManager
 from core.signal_manager import SignalManager
 from functools import partial
+from PyQt5.QtGui import QCursor
 
 class Network(QtWidgets.QWidget):
     def __init__(self, signal_manager: SignalManager, parent=None):
@@ -79,6 +80,7 @@ class Network(QtWidgets.QWidget):
         for i, component in enumerate(self.model_manager):
             # Add the component's widget
             widget = component.get_widget()
+            widget.setCursor(QCursor(Qt.PointingHandCursor))
             widget.clicked.connect(lambda _, component=component: print(component.params))
             scaling_factor = widget.scaling_factor if hasattr(widget, 'scaling_factor') else 1
             component_height = int(self.height() * 0.3 * scaling_factor  * zoom)

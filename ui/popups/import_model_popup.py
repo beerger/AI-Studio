@@ -8,34 +8,46 @@ from models.pytorch_models import MODELS
 import torchvision.models as models
 import inspect
 from core.components import WRAPPER_REGISTRY
+from ui.popups.frameless_popup import FrameLessPopup
+from PyQt5 import QtCore
 
-class ImportModelPopup(QDialog):
+class ImportModelPopup(FrameLessPopup):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.init_ui()
     
     def init_ui(self):
-        self.setWindowTitle("Import Model")
-        self.layout = QVBoxLayout()
+        # Update the title in the custom title bar
+        self.title_label.setText("Import Model")
+
+        # Use the content layout provided by FrameLessPopup
         self.form_layout = QFormLayout()
+
+        # Model path and type selection
         self.model_path = QLineEdit()
-        
+        self.model_path_label = QLabel("Model Path")
         self.model_type = QComboBox()
         self.model_type.addItems(["PyTorch", "ONNX"])
         self.model_type_label = QLabel("Model Type")
-        self.layout.addWidget(self.model_type_label)
-        self.layout.addWidget(self.model_type)
-        
+
+        # Add model type to the form layout
+        self.form_layout.addRow(self.model_type_label, self.model_type)
+
+        # Setup combo boxes
         self.setup_combo_boxes()
-        self.layout.addLayout(self.form_layout)
-        
-        self.model_path_label = QLabel("Model Path")
-        self.layout.addWidget(self.model_path_label)
-        self.layout.addWidget(self.model_path)
+
+        # Add model path to the form layout
+        self.form_layout.addRow(self.model_path_label, self.model_path)
+
+        # Browse button
         self.browse_button = QPushButton("Browse")
         self.browse_button.clicked.connect(self.browse)
-        self.layout.addWidget(self.browse_button)
-        
+        self.form_layout.addRow(self.browse_button)
+
+        # Add form layout to the content layout
+        self.content_layout.addLayout(self.form_layout)
+
+        # Add scroll area for additional options
         self.scroll_area = QScrollArea(self)
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setAlignment(Qt.AlignCenter)
@@ -43,16 +55,14 @@ class ImportModelPopup(QDialog):
         self.container = QWidget()
         self.container_layout = QHBoxLayout(self.container)
         self.container.setLayout(self.container_layout)
-
         self.scroll_area.setWidget(self.container)
 
-        self.layout.addWidget(self.scroll_area)
+        self.content_layout.addWidget(self.scroll_area)
 
-        
+        # Import button
         self.import_button = QPushButton("Import")
         self.import_button.clicked.connect(self.import_model)
-        self.layout.addWidget(self.import_button)
-        self.setLayout(self.layout)
+        self.content_layout.addWidget(self.import_button)
     
     def import_model(self):
         model = models.__dict__[self.model_combo.currentText()](weights=self.weights_combo.currentText())

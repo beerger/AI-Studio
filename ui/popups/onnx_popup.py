@@ -3,11 +3,12 @@ from PyQt5.QtWidgets import (
 )
 import torch
 import constants.tooltips as tt
+from ui.popups.frameless_popup import FrameLessPopup
+from ui.popups.custom_messagebox import CustomMessageBox
 
-class ONNXParametersPopup(QDialog):
+class ONNXParametersPopup(FrameLessPopup):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("ONNX export") 
         self.sizes = {
                 'torch.float32': 4,
                 'torch.float16': 2,
@@ -22,9 +23,8 @@ class ONNXParametersPopup(QDialog):
                 'torch.bfloat16': 2
             }
         
-        # Main layout
-        layout = QVBoxLayout(self)
-
+        self.title_label.setText("ONNX Export")
+        
         # Form layout for input dimensions
         self.form_layout = QFormLayout()
         self.batch_size_input = QLineEdit("1")
@@ -34,10 +34,10 @@ class ONNXParametersPopup(QDialog):
         
         # Help text
         help_label = QLabel(
-            "Specify dimensions for the input tensor. \nHover the mouse over each field for more information."
+            "Specify dimensions for the input tensor. \nHover the mouse over each input field for more information."
         )
         help_label.setStyleSheet("color: gray; font-size: 14px;")
-        layout.addWidget(help_label)
+        self.content_layout.addWidget(help_label)
 
         self.form_layout.addRow("Batch Size:", self.batch_size_input)
         self.form_layout.addRow("Channels:", self.channels_input)
@@ -79,9 +79,9 @@ class ONNXParametersPopup(QDialog):
         self.ok_button.clicked.connect(self.validate_values)
         self.cancel_button.clicked.connect(self.reject)
 
-        layout.addLayout(self.form_layout)
-        layout.addWidget(self.ok_button)
-        layout.addWidget(self.cancel_button)
+        self.content_layout.addLayout(self.form_layout)
+        self.content_layout.addWidget(self.ok_button)
+        self.content_layout.addWidget(self.cancel_button)
         
         self.set_tooltips()
     
@@ -171,8 +171,7 @@ class ONNXParametersPopup(QDialog):
             # trigger self.accept
             self.accept()
         except ValueError as e:
-            
-            QMessageBox.warning(self, "Invalid", f"{e}")            
+            CustomMessageBox.warning(self, "Invalid", f"{e}")
             
     # Only safe to call after validate_values
     def get_values(self) -> dict:
@@ -187,22 +186,20 @@ class ONNXParametersPopup(QDialog):
             "dynamic_shapes": self.dynamic_shapes_checkbox.isChecked()
         }
 
-class ONNXErrorPopup(QDialog):
+class ONNXErrorPopup(FrameLessPopup):
     RETRY = 1
     def __init__(self, message: str, parent=None):
         super().__init__(parent)
-        
-        self.setWindowTitle("Export failed") 
-        self.layout = QVBoxLayout()
+        self.title_label.setText("Export Failed")
         
         self.main_text = QLabel("Failed to export the model to ONNX. Press 'See more' for details. Press 'Retry' to try again.")
         self.main_text.setWordWrap(True)
-        self.layout.addWidget(self.main_text)
+        self.content_layout.addWidget(self.main_text)
         
         self.detailed_text = QTextEdit(message)
         self.detailed_text.setReadOnly(True)
         self.detailed_text.hide()
-        self.layout.addWidget(self.detailed_text)
+        self.content_layout.addWidget(self.detailed_text)
         
         button_layout = QHBoxLayout()
         self.ok_button = QPushButton("OK")
@@ -217,10 +214,8 @@ class ONNXErrorPopup(QDialog):
         button_layout.addWidget(self.ok_button)
         button_layout.addWidget(self.see_more_button)
         button_layout.addWidget(self.retry_button)
-        self.layout.addLayout(button_layout)
+        self.content_layout.addLayout(button_layout)
         
-        self.setLayout(self.layout)
-
     def see_more(self):
         if self.detailed_text.isVisible():
             self.detailed_text.hide()
@@ -228,27 +223,34 @@ class ONNXErrorPopup(QDialog):
         else:
             self.detailed_text.show()
             self.see_more_button.setText("Hide Details")
-            
-    
+
+        # Ensure layout updates
+        self.content_layout.activate()  # Recalculate the layout
+
+        # Adjust the window size to fit new content
+        self.adjustSize()
+
+        # Optionally enforce a maximum size to prevent uncontrolled growth
+        self.setMaximumSize(self.sizeHint())
+        
     def retry(self):
         return self.done(self.RETRY)
     
-class TensorValuePopup(QDialog):
+class TensorValuePopup(FrameLessPopup):
     def __init__(self, shape, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Specify Tensor Values")
+        self.title_label.setText("Specify Tensor Values")
         self.shape = shape
 
-        self.layout = QVBoxLayout(self)
         self.label = QLabel(f"Enter values for tensor of shape {shape}:")
-        self.layout.addWidget(self.label)
+        self.content_layout.addWidget(self.label)
 
         self.text_edit = QTextEdit(self)
-        self.layout.addWidget(self.text_edit)
+        self.content_layout.addWidget(self.text_edit)
 
         self.ok_button = QPushButton("OK")
         self.ok_button.clicked.connect(self.accept)
-        self.layout.addWidget(self.ok_button)
+        self.content_layout.addWidget(self.ok_button)
 
     def get_tensor_values(self):
         text = self.text_edit.toPlainText()
@@ -257,5 +259,5 @@ class TensorValuePopup(QDialog):
             tensor = torch.tensor(values).reshape(self.shape)
             return tensor
         except RuntimeError as e:
-            QMessageBox.warning(self, "Invalid", f"Error creating tensor: {e}")
+            CustomMessageBox.warning(self, "Invalid", f"Error creating tensor: {e}")
             return None

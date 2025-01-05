@@ -64,15 +64,20 @@ class ONNXExporter(QtCore.QThread):
             )
             onnx_program.save(save_path)
             self.progress_signal.emit(100)
-
             # Notify success
             self.success_signal.emit()
             print(f"Model successfully exported to ONNX at: {save_path}")
         except Exception as e:
-            self.progress_signal.emit(100)
             self.error_signal.emit(str(e))
         finally:
             # Ensure the temporary file is removed
             if self.temp_path and os.path.exists(self.temp_path):
                 os.remove(self.temp_path)
                 print(f"Temporary file removed: {self.temp_path}")
+    
+    def terminate(self):
+        # Ensure the temporary file is removed
+        if self.temp_path and os.path.exists(self.temp_path):
+                os.remove(self.temp_path)
+                print(f"Temporary file removed: {self.temp_path}")
+        return super().terminate()

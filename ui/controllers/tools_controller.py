@@ -8,6 +8,8 @@ from core.onnx_exporter import ONNXExporter
 from ui.popups.onnx_popup import ONNXParametersPopup, ONNXErrorPopup
 from ui.popups.file_popup import get_output_popup
 from ui.popups.import_model_popup import ImportModelPopup
+from ui.popups.custom_messagebox import CustomMessageBox
+from ui.popups.custom_progress_dialog import CustomProgressDialog
 import torch
 import os
 
@@ -32,9 +34,9 @@ class ToolsController:
         input_tensor = torch.randn(1, 3, 224, 224)
         try:
             self.model_manager.forward(input_tensor)
-            QtWidgets.QMessageBox.information(None, "Validation", "Network is valid")
+            CustomMessageBox.info(None, "Validation", "Network is valid")
         except Exception as e:
-            QtWidgets.QMessageBox.critical(None, "Validation", f"Network is invalid: {e}")
+            CustomMessageBox.error(None, "Validation", f"Network is invalid: {e}")
     
     def generate_summary(self) -> None:
         """
@@ -63,15 +65,16 @@ class ToolsController:
             exporter = ONNXExporter("MyModel", values)
 
             # Create a progress dialog
-            progress_dialog = QtWidgets.QProgressDialog("Exporting model...", "Cancel", 0, 100)
+            progress_dialog = CustomProgressDialog("Exporting model", "Test")#QtWidgets.QProgressDialog("Exporting model...", "Cancel", 0, 100)
             progress_dialog.setWindowModality(QtCore.Qt.WindowModal)
             progress_dialog.setValue(0)
 
             # Connect exporter signals
             exporter.progress_signal.connect(progress_dialog.setValue)
-            exporter.success_signal.connect(lambda: QtWidgets.QMessageBox.information(None, "Export", "Model successfully exported to ONNX"))
+            exporter.success_signal.connect(lambda: CustomMessageBox.information(None, "Export", "Model successfully exported to ONNX"))
+            exporter.success_signal.connect(progress_dialog.close_safely)
             exporter.error_signal.connect(lambda msg: self.handle_onnx_error(msg, values))
-            exporter.finished.connect(progress_dialog.close)  # Close progress dialog on completion
+            exporter.error_signal.connect(progress_dialog.close_safely)
             progress_dialog.canceled.connect(exporter.terminate)  # Allow canceling export
 
             # Start export in a separate thread

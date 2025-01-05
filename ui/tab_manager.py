@@ -11,6 +11,7 @@ from ui.tabs.run_tab import RunTab
 from ui.tabs.help_tab import HelpTab
 from ui.tabs.debug_tab import DebugTab
 from core.signal_manager import SignalManager
+from PyQt5.QtGui import QCursor
 
 class TabManager(QtWidgets.QWidget):
     
@@ -39,6 +40,7 @@ class TabManager(QtWidgets.QWidget):
         self.tab.addTab(HelpTab(), "HELP")
         self.tab.addTab(DebugTab(), "DEBUG")
         self.layout.addWidget(self.tab)
+        #self.tab.setCursor(QCursor(Qt.PointingHandCursor))
         
         self.signal_manager.apply_scaling.connect(self.apply_scaling)
         self.apply_stylesheet()
@@ -64,6 +66,11 @@ class TabManager(QtWidgets.QWidget):
             padding: {padding}px;
         }}
         """)
+        self.tab.widget(0).apply_scaling(self.scaling_factor)
+        self.tab.widget(1).apply_scaling(self.scaling_factor)
+        self.tab.widget(2).apply_scaling(self.scaling_factor)
+        self.tab.widget(3).apply_scaling(self.scaling_factor)
+        
 
     def calculate_tab_width(self):
         """Calculate the width of the longest tab, scaled for screen DPI."""

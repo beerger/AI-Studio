@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets
 from utils.session_state import SessionState
 from core.model_manager import ModelManager
 from core.signal_manager import SignalManager
+from ui.popups.custom_messagebox import CustomMessageBox
 
 class FileController:
     CONFIRMATION_TITLE = "Confirmation"
@@ -21,22 +22,6 @@ class FileController:
         self.signal_manager.save_as_signal.connect(self.save_as)
         self.signal_manager.close_signal.connect(self.close_main_window)
 
-    def show_confirmation_dialog(self, message: str) -> bool:
-        """
-        Displays a confirmation dialog with Yes/No options.
-        
-        Params: 
-            message: The message to display.
-        Return: 
-            True if Yes is selected, False otherwise.
-        """
-        reply = QtWidgets.QMessageBox.question(
-            None, self.CONFIRMATION_TITLE, message,
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, 
-            QtWidgets.QMessageBox.No
-        )
-        return reply == QtWidgets.QMessageBox.Yes
-
     def get_file_path(self, save: bool = False) -> str:
         """
         Opens a file dialog to get the file path.
@@ -54,7 +39,7 @@ class FileController:
         """
         Clears the current model manager and refreshes the network display.
         """
-        if self.show_confirmation_dialog(self.NEW_NETWORK_MESSAGE):
+        if CustomMessageBox.question(None, "New Network", self.NEW_NETWORK_MESSAGE):
             self.model_manager.reset()
             self.signal_manager.update_visualization_signal.emit()
             SessionState.save({"last_save_path": None})
@@ -85,7 +70,7 @@ class FileController:
             try:
                 self.model_manager.save(save_path)
             except Exception as e:
-                QtWidgets.QMessageBox.critical(None, "Error", f"Failed to save file: {e}")
+                CustomMessageBox.error(None, "Error", f"Failed to save file: {e}")
 
     def save_as(self) -> None:
         """
@@ -97,11 +82,11 @@ class FileController:
                 self.model_manager.save(path)
                 SessionState.save({"last_save_path": path})
             except Exception as e:
-                QtWidgets.QMessageBox.critical(None, "Error", f"Failed to save file: {e}")
+                CustomMessageBox.error(None, "Error", f"Failed to save file: {e}")
 
     def close_main_window(self) -> None:
         """
         Closes the main window after user confirmation.
         """
-        if self.show_confirmation_dialog(self.CLOSE_MESSAGE):
+        if CustomMessageBox.question(None, self.CONFIRMATION_TITLE, self.CLOSE_MESSAGE):
             QtWidgets.qApp.quit()
